@@ -8,7 +8,7 @@ int			read_data(int fd)
 	t_request	*request;
 
 	size = 0;
-	ft_bzero(buff, BUFF_SOCKET);
+	bzero(buff, BUFF_SOCKET);
 	while ((size = recv(fd, buff, BUFF_SOCKET, 0)) > 0)
 	{
 		write(1, buff, size);
@@ -96,7 +96,10 @@ int			main(int argc, char **argv)
 
 	(void)argv;
 	if (argc != 1)
-		ft_error("Usage: ./server");
+	{
+		printf("Usage: ./server\n");
+		exit(EXIT_FAILURE);
+	}
 	if ((sock_fd = socket_int()) == -1)
 		exit(EXIT_FAILURE);
 	address = NULL;

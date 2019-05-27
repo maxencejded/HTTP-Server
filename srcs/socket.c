@@ -22,7 +22,7 @@ int			socket_bind(int fd, int port, char **address)
 {
 	struct sockaddr_in	bind_s;
 
-	ft_bzero(&bind_s, sizeof(struct sockaddr_in));
+	bzero(&bind_s, sizeof(struct sockaddr_in));
 	bind_s.sin_family = AF_INET;
 	bind_s.sin_port = htons(port);
 	bind_s.sin_addr.s_addr = htonl(INADDR_ANY);
@@ -42,13 +42,13 @@ int			socket_accept(int fd, char **address)
 	struct sockaddr_in	sock_init;
 
 	sock_len = sizeof(struct sockaddr_in);
-	ft_bzero(&sock_init, sizeof(struct sockaddr_in));
+	bzero(&sock_init, sizeof(struct sockaddr_in));
 	sock = accept(fd, (struct sockaddr *)&sock_init, &sock_len);
 	if (sock == -1)
 	{
 		perror("ERROR: Accept");
 		return (-1);
 	}
-	*address = ft_strdup(inet_ntoa(sock_init.sin_addr));
+	*address = strdup(inet_ntoa(sock_init.sin_addr));
 	return (sock);
 }

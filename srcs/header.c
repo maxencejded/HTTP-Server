@@ -6,7 +6,7 @@ static t_request	*header_init(void)
 
 	if ((data = (t_request *)malloc(sizeof(t_request))) == NULL)
 		return (NULL);
-	ft_bzero(data, sizeof(t_request));
+	bzero(data, sizeof(t_request));
 	return (data);
 }
 

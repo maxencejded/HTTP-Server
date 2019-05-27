@@ -2,7 +2,7 @@
 
 static uint8_t		header_http_version(char *method, t_request *header)
 {
-	if (ft_strncmp(method, "HTTP/", 5) != 0)
+	if (strncmp(method, "HTTP/", 5) != 0)
 		return (0);
 	method = method + 5;
 	if (method[0] == '1')
@@ -28,7 +28,7 @@ static uint8_t		header_file(char *method, t_request *header)
 	len = 0;
 	while (method[i + len] && method[i + len] != ' ')
 		++len;
-	header->file = (int8_t *)ft_strmcpy((char *)&method[i], len);
+	header->file = (int8_t *)strndup((char *)&method[i], len);
 	method = method + i + len + 1;
 	if (header_http_version(method, header) == 0)
 		return (0);
@@ -55,7 +55,7 @@ uint8_t				header_method(char *method, t_request *header)
 	i = 0;
 	while (i < METHOD_NUMBER)
 	{
-		if (ft_strncmp(method, m[i].method, m[i].length) == 0)
+		if (strncmp(method, m[i].method, m[i].length) == 0)
 		{
 			header->method = m[i].number;
 			header_file(method, header);
