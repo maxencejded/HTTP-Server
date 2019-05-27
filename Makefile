@@ -6,7 +6,7 @@ INCLUDES		= -I includes
 
 BASE			= server.c socket.c
 REQUEST			= request.c method.c
-RESPONSE		=
+RESPONSE		= response.c
 LIBFT			= strsplit.c strdel.c ptrdel.c print_memory.c
 
 REQUEST_FCT		= $(addprefix request/, $(REQUEST))

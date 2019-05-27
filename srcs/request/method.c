@@ -1,20 +1,22 @@
-#include "http.h"
+#include "server.h"
 
-static uint8_t		header_http_version(char *method, t_request *header)
+static uint8_t		method_protocol(char *method, t_http *data)
 {
-	if (strncmp(method, "HTTP/", 5) != 0)
+	if (*method == '\0' || strncmp(method, "HTTP/", 5) != 0)
 		return (0);
 	method = method + 5;
-	if (method[0] == '1')
-		header->http = 1;
-	else if (method[0] == '2')
-		header->http = 2;
+	if (strncmp("1.0", method, 3) == 0)
+		data->protocol = PROTOCOL_1_0;
+	else if (strncmp("1.1", method, 3) == 0)
+		data->protocol = PROTOCOL_1_1;
+	else if (strncmp("2.0", method, 3) == 0)
+		data->protocol = PROTOCOL_2_0;
 	else
 		return (0);
 	return (1);
 }
 
-static uint8_t		header_file(char *method, t_request *header)
+static uint8_t		method_path(char *method, t_http *data)
 {
 	uint32_t	i;
 	uint32_t	len;
@@ -28,22 +30,22 @@ static uint8_t		header_file(char *method, t_request *header)
 	len = 0;
 	while (method[i + len] && method[i + len] != ' ')
 		++len;
-	header->file = (int8_t *)strndup((char *)&method[i], len);
-	if (header_http_version(method + i + len + 1, header) == 0)
+	data->path = strndup(&method[i], len);
+	if (method_protocol(method + i + len + 1, data) == 0)
 		return (0);
 	return (1);
 }
 
 #define METHOD_NUMBER 9
 
-uint8_t				header_method(char *method, t_request *header)
+uint8_t				method(char *method, t_http *data)
 {
 	uint8_t			i;
 	static t_method	m[METHOD_NUMBER] = {
 		{"GET", 3, METHOD_GET},
 		{"HEAD", 4, METHOD_HEAD},
 		{"POST", 4, METHOD_POST},
-		{"PUT", 3, 4},
+		{"PUT", 3, METHOD_PUT},
 		{"DELETE", 6, 5},
 		{"CONNECT", 7, 6},
 		{"OPTIONS", 7, 7},
@@ -56,8 +58,8 @@ uint8_t				header_method(char *method, t_request *header)
 	{
 		if (strncmp(method, m[i].method, m[i].length) == 0)
 		{
-			header->method = m[i].number;
-			header_file(method, header);
+			data->method = m[i].number;
+			method_path(method, data);
 			return (1);
 		}
 		++i;

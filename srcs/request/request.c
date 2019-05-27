@@ -1,37 +1,38 @@
-#include "http.h"
+#include "server.h"
 
-static t_request	*header_init(void)
+static t_http	*http_init(void)
 {
-	t_request	*data;
+	t_http	*data;
 
-	if ((data = (t_request *)malloc(sizeof(t_request))) == NULL)
+	if ((data = (t_http *)malloc(sizeof(t_http))) == NULL)
 		return (NULL);
-	bzero(data, sizeof(t_request));
+	bzero(data, sizeof(t_http));
 	return (data);
 }
 
-void			header_free(t_request *data)
+void			http_free(t_http *data)
 {
 	if (data == NULL)
 		return ;
-	free(data->file);
+	free(data->path);
+	free(data->content);
 	free(data);
 }
 
-t_request			*header_parse(char *request, int32_t size)
+t_http			*header(char *request, int32_t size)
 {
 	uint8_t		i;
 	char		**fields;
-	t_request	*header;
+	t_http	*header;
 
-	if ((header = header_init()) == NULL)
+	if ((header = http_init()) == NULL)
 		return (NULL);
 	request[size] = '\0';
 	if ((fields = strsplit(request, '\n')) == NULL)
 		return (NULL);
-	if (fields[0] == NULL || header_method(fields[0], header) == 0)
+	if (fields[0] == NULL || method(fields[0], header) == 0)
 	{
-		header_free(header);
+		http_free(header);
 		return (NULL);
 	}
 	i = 1;

@@ -1,18 +1,18 @@
-#include "http.h"
+#include "server.h"
 
 int			read_data(int fd)
 {
 	int32_t		size;
 	char		*end;
 	char		buff[BUFF_SOCKET];
-	t_request	*request;
+	t_http		*request;
 
 	size = 0;
 	bzero(buff, BUFF_SOCKET);
 	while ((size = recv(fd, buff, BUFF_SOCKET, 0)) > 0)
 	{
 		write(1, buff, size);
-		if ((end = (char *)strstr((const char *)buff, "\r\n\r\n")) != NULL)
+		if ((end = strstr((const char *)buff, "\r\n\r\n")) != NULL)
 		{
 			end = end + 4;
 			break ;
@@ -20,10 +20,10 @@ int			read_data(int fd)
 	}
 	if (end - buff > size)
 		printf("More Data to read: %ld bytes", size - (end - buff));
-	request = header_parse(buff, ((end - 4) - buff));
+	request = header(buff, ((end - 4) - buff));
 	//    write(fd, "HTTP/1.1 200 OK\nContent-Type: text/plain\nConnection: close\nContent-Length: 12\n\nHello world!", 91);
 	write(fd, "HTTP/1.1 200 OK\nContent-Type: text/html\nConnection: close\nContent-Length: 640\n\n<!DOCTYPE html><html><head><meta charset=\"utf-8\"><script src=\"script.js\"></script><title>Pokequiz</title><link href=\"style.css\" type=\"text/css\" rel=\"stylesheet\"></head><body><h1>Who's that Pokémon ?</h1><div class=\"all\"><img id=\"imgpoke\"><img><p id=\"pokemon_name\"></p><br><div class=\"input\"><select id=\"lang\"><option type=\"radio\" value=\"pokemon_g2_fr\">French</option><option type=\"radio\" value=\"pokemon_g2_en\">English</option></select><input id=\"namepoke\" type=\"text\" placeholder=\"Pokemon name\"></input><input id=\"submit\" type=\"submit\" value=\"Submit\"></input></div><p>Score : <b id=\"score\">0</b>/<b id=\"total\">0</b></p></div></body></html>", 727);
-	header_free(request);
+	http_free(request);
 	return (1);
 }
 
@@ -50,8 +50,10 @@ int				connection_add(int fd, char *address, uint16_t connect)
 	else if (pid < 0)
 	{
 		perror("ERROR: Fork");
+		strdel(&address);
 		return (1);
 	}
+	strdel(&address);
 	return (0);
 }
 
@@ -68,7 +70,6 @@ int				loop(int fd)
 	{
 		if (connection_add(sock_new, address, connect) == 1)
 			return (0);
-		strdel(&address);
 		close(sock_new);
 		++connect;
 	}
