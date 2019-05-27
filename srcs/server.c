@@ -68,7 +68,7 @@ int				loop(int fd)
 	{
 		if (connection_add(sock_new, address, connect) == 1)
 			return (0);
-		ft_strdel(&address);
+		strdel(&address);
 		close(sock_new);
 		++connect;
 	}
@@ -115,7 +115,7 @@ int			main(int argc, char **argv)
 	}
 	printf("Starting new Server\nAdrress: %s:%d\n", address, PORT);
 	signal(SIGINT, sigstop);
-	ft_strdel(&address);
+	strdel(&address);
 	loop(sock_fd);
 	return (0);
 }

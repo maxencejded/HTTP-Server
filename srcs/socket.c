@@ -31,7 +31,7 @@ int			socket_bind(int fd, int port, char **address)
 		perror("ERROR: Bind");
 		return (0);
 	}
-	*address = ft_strdup(inet_ntoa(bind_s.sin_addr));
+	*address = strdup(inet_ntoa(bind_s.sin_addr));
 	return (1);
 }
 

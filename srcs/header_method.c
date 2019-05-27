@@ -29,8 +29,7 @@ static uint8_t		header_file(char *method, t_request *header)
 	while (method[i + len] && method[i + len] != ' ')
 		++len;
 	header->file = (int8_t *)strndup((char *)&method[i], len);
-	method = method + i + len + 1;
-	if (header_http_version(method, header) == 0)
+	if (header_http_version(method + i + len + 1, header) == 0)
 		return (0);
 	return (1);
 }
@@ -44,12 +43,12 @@ uint8_t				header_method(char *method, t_request *header)
 		{"GET", 3, METHOD_GET},
 		{"HEAD", 4, METHOD_HEAD},
 		{"POST", 4, METHOD_POST},
-		{"PUT", 3, 3},
-		{"DELETE", 6, 4},
-		{"CONNECT", 7, 5},
-		{"OPTIONS", 7, 6},
-		{"TRACE", 5, 7},
-		{"PATCH", 5, 8}
+		{"PUT", 3, 4},
+		{"DELETE", 6, 5},
+		{"CONNECT", 7, 6},
+		{"OPTIONS", 7, 7},
+		{"TRACE", 5, 8},
+		{"PATCH", 5, 9}
 	};
 
 	i = 0;

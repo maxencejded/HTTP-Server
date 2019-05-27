@@ -4,6 +4,7 @@
 # include <netdb.h>
 # include <stdio.h>
 # include <stdlib.h>
+# include <string.h>
 # include <unistd.h>
 # include <arpa/inet.h>
 # include <sys/socket.h>
@@ -17,9 +18,9 @@
 
 # pragma pack(2)
 
-# define METHOD_GET		0
-# define METHOD_HEAD	1
-# define METHOD_POST	2
+# define METHOD_GET		1
+# define METHOD_HEAD	2
+# define METHOD_POST	3
 
 typedef struct		s_method
 {
@@ -33,13 +34,6 @@ typedef struct		s_request
 	uint8_t			method;
 	int8_t			*file;
 	uint8_t			http;
-	// int8_t			*host;
-	// int8_t			*user_agent;
-	// int8_t			*accept;
-	// uint8_t			connection;
-	// uint32_t		encoding;
-	// int8_t			*cookie;
-	// int8_t			*request;
 }					t_request;
 
 # define HTTP_1	"HTTP/1.1"

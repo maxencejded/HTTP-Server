@@ -27,7 +27,7 @@ t_request			*header_parse(char *request, int32_t size)
 	if ((header = header_init()) == NULL)
 		return (NULL);
 	request[size] = '\0';
-	if ((fields = ft_strsplit(request, '\n')) == NULL)
+	if ((fields = strsplit(request, '\n')) == NULL)
 		return (NULL);
 	if (fields[0] == NULL || header_method(fields[0], header) == 0)
 	{
@@ -35,8 +35,8 @@ t_request			*header_parse(char *request, int32_t size)
 		return (NULL);
 	}
 	i = 1;
-	while (fields[i] != NULL)
-		++i;
-	ft_ptrdel(fields);
+	// while (fields[i] != NULL)
+	// 	++i;
+	ptrdel(fields);
 	return (header);
 }
