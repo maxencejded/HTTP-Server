@@ -2,6 +2,6 @@
 
 void	strdel(char **str)
 {
-	free(str);
+	free(*str);
 	str = NULL;
 }

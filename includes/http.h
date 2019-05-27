@@ -57,6 +57,4 @@ t_request			*header_parse(char *request, int32_t size);
 uint8_t		        header_method(char *method, t_request *header);
 void				header_free(t_request *data);
 
-void				print_memory(void *addr, size_t size);
-
 #endif

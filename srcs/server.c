@@ -114,8 +114,8 @@ int			main(int argc, char **argv)
 		exit(EXIT_FAILURE);
 	}
 	printf("Starting new Server\nAdrress: %s:%d\n", address, PORT);
-	signal(SIGINT, sigstop);
 	strdel(&address);
+	signal(SIGINT, sigstop);
 	loop(sock_fd);
 	return (0);
 }
