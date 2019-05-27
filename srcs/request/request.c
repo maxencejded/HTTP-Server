@@ -23,21 +23,21 @@ t_http			*header(char *request, int32_t size)
 {
 	uint8_t		i;
 	char		**fields;
-	t_http	*header;
+	t_http		*header;
 
 	if ((header = http_init()) == NULL)
 		return (NULL);
 	request[size] = '\0';
-	if ((fields = strsplit(request, '\n')) == NULL)
+	if ((fields = splitheader(request)) == NULL)
 		return (NULL);
 	if (fields[0] == NULL || method(fields[0], header) == 0)
 	{
 		http_free(header);
 		return (NULL);
 	}
-	i = 1;
-	// while (fields[i] != NULL)
-	// 	++i;
+	i = 0;
+	while (fields[++i] != NULL)
+		fields_dispatch(fields[i], header);
 	ptrdel(fields);
 	return (header);
 }
