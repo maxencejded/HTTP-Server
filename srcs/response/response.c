@@ -24,7 +24,6 @@ static t_reponse	*reponse_init(void)
 		return (NULL);
 	bzero(answer, sizeof(t_reponse));
 	return (answer);
-}
 
 /*
  * Handling bad responses closing the connection
@@ -32,8 +31,16 @@ static t_reponse	*reponse_init(void)
 
 static int			end_connection_error(t_http *request, int reponse, int fd)
 {
-	printf("%s\n", concat(WEBSITE_FOLDER_PATH, "/index.html"));
-	dprintf(fd, "HTTP/%s %d ERROR\nContent-Type: text/plain\nConnection: close\n\nContent-Length: 14\n\nError People!\n", protocol_version(request), reponse);
+	size_t			content_length;
+	char			*message;
+
+	content_length = snprintf(NULL, 0, "HTTP/%s %d OK\nContent-Type: text/plain\nConnection: close\nContent-Length: %lu\n\nError People!", protocol_version(request), reponse, strlen("Error People!"));
+	if ((message = malloc(sizeof(char) * (content_length + 1))) == NULL)
+		return (end_connection_error(request, 500, fd));
+	bzero(message, sizeof(char) * (content_length + 1));
+	sprintf(message, "HTTP/%s %d OK\nContent-Type: text/plain\nConnection: close\nContent-Length: %lu\n\nError People!", protocol_version(request), reponse, strlen("Error People!"));
+	write(fd, message, content_length);
+	strdel(&message);
 	return (reponse);
 }
 
@@ -51,7 +58,7 @@ static int			end_connection_success(t_http *request, int reponse, int fd)
 	else if ((complete_path = concat(WEBSITE_FOLDER_PATH, request->path)) == NULL)
 		return (end_connection_error(request, 500, fd));
 
-	dprintf(fd, "HTTP/%s %d SUCCESS\nContent-Type: text/plain\nConnection: close\nContent-Length: 16\n\nSuccess People!\n", protocol_version(request), reponse);
+	dprintf(fd, "HTTP/%s %d OK\nContent-Type: text/plain\nConnection: close\nContent-Length: 16\n\nSuccess People!\n", protocol_version(request), reponse);
 	return (reponse);
 }
 
