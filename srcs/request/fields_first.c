@@ -8,8 +8,9 @@ void				fields_a_im(char *str, t_http *data)
 
 void				fields_accept(char *str, t_http *data)
 {
-	(void)str;
-	(void)data;
+	while (*str && *str == ' ')
+		++str;
+	data->accept = strdup(str);
 }
 
 void				fields_accept_charset(char *str, t_http *data)

@@ -15,8 +15,10 @@ void			http_free(t_http *data)
 	if (data == NULL)
 		return ;
 	free(data->path);
+	free(data->accept);
 	free(data->content);
 	free(data);
+	data = NULL;
 }
 
 t_http			*header(char *request, int32_t size)

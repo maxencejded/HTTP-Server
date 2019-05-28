@@ -58,7 +58,7 @@ int			receive(int fd)
 		return (0);
 	}
 	request = header(buff, ((end - 4) - buff));
-	if (request->content_length != 0)
+	if (request->content_length)
 		if (receive_content(fd, request, end, size - (end - buff)) == 0)
 			return (0);
 	printf("Reponse value = %d\n", response(request, fd));
@@ -81,10 +81,10 @@ int				connection_add(int fd, char *address, uint16_t connect)
 	{
 		perror("ERROR: Fork");
 		strdel(&address);
-		return (1);
+		return (0);
 	}
 	strdel(&address);
-	return (0);
+	return (1);
 }
 
 int				loop(int fd)
@@ -98,7 +98,7 @@ int				loop(int fd)
 	signal(SIGCHLD, sigchld);
 	while ((sock_new = socket_accept(fd, &address)) > 0)
 	{
-		if (connection_add(sock_new, address, connect) == 1)
+		if (connection_add(sock_new, address, connect) == 0)
 			return (0);
 		close(sock_new);
 		++connect;
@@ -134,7 +134,7 @@ int			main(int argc, char **argv)
 	printf("Starting new Server\nAdrress: %s:%d\n", address, PORT);
 	strdel(&address);
 	signal(SIGINT, sigstop);
-	loop(sock_fd);
-	close(sock_fd);
+	if (loop(sock_fd) == 0)
+		exit_server();
 	return (0);
 }
