@@ -1,6 +1,8 @@
 #include "server.h"
 #include "response.h"
 
+#include <fcntl.h>
+
 /*
  * Get method -> 1
  * Head method -> 2
@@ -52,14 +54,33 @@ static int			end_connection_error(t_http *request, int reponse, int fd)
 static int			end_connection_success(t_http *request, int reponse, int fd)
 {
 	char	*complete_path;
+	int		file_fd;
+	int		file_size;
+	char	*content;
 
-	if (strcmp(request->path, "/") == 0
-	&& (complete_path = concat(WEBSITE_FOLDER_PATH, "/index.html")) == NULL)
+	if ((strcmp(request->path, "/") == 0) && ((complete_path = concat(WEBSITE_FOLDER_PATH, "/index.html")) == NULL))
 		return (end_connection_error(request, 500, fd));
 	else if ((complete_path = concat(WEBSITE_FOLDER_PATH, request->path)) == NULL)
 		return (end_connection_error(request, 500, fd));
 
-	dprintf(fd, "HTTP/%s %d OK\nContent-Type: text/plain\nConnection: close\nContent-Length: 16\n\nSuccess People!\n", protocol_version(request), reponse);
+	if (strcmp(request->path, "/") == 0)
+		if ((complete_path = concat(WEBSITE_FOLDER_PATH, "/index.html")) == NULL)
+			return (end_connection_error(request, 500, fd));
+	if ((file_fd = open(complete_path, O_RDONLY)) < 0)
+	{
+		free(complete_path);
+		return (end_connection_error(request, 500, fd));
+	}
+	if ((content = get_file_content(file_fd, &file_size, complete_path)) == NULL)
+	{
+		free(complete_path);
+		return (end_connection_error(request, 503, fd));
+	}
+	if (strstr(complete_path, ".css") != NULL)
+		dprintf(fd, "HTTP/%s %d OK\nContent-Type: text/css\nConnection: close\nContent-Length: %d\n\n%s", protocol_version(request), reponse, file_size, content);
+	else
+		dprintf(fd, "HTTP/%s %d OK\nContent-Type: text/html\nConnection: close\nContent-Length: %d\n\n%s", protocol_version(request), reponse, file_size, content);
+	free(complete_path);
 	return (reponse);
 }
 
