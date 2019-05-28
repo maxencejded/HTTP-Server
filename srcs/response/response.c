@@ -39,7 +39,7 @@ static int			end_connection_error(t_http *request, int reponse, int fd)
 
 	content_length = snprintf(NULL, 0, "HTTP/%s %d OK\nContent-Type: text/plain\nConnection: close\nContent-Length: %lu\n\nError People!", protocol_version(request), reponse, strlen("Error People!"));
 	if ((message = malloc(sizeof(char) * (content_length + 1))) == NULL)
-		return (end_connection_error(request, 500, fd));
+		return (end_connection_error(request, INTERNAL_SERVER_ERR, fd));
 	bzero(message, sizeof(char) * (content_length + 1));
 	sprintf(message, "HTTP/%s %d OK\nContent-Type: text/plain\nConnection: close\nContent-Length: %lu\n\nError People!", protocol_version(request), reponse, strlen("Error People!"));
 	write(fd, message, content_length);
@@ -59,22 +59,22 @@ static int			end_connection_success(t_http *request, int reponse, int fd)
 	char	*content;
 
 	if ((strcmp(request->path, "/") == 0) && ((complete_path = concat(WEBSITE_FOLDER_PATH, "/index.html")) == NULL))
-		return (end_connection_error(request, 500, fd));
+		return (end_connection_error(request, INTERNAL_SERVER_ERR, fd));
 	else if ((complete_path = concat(WEBSITE_FOLDER_PATH, request->path)) == NULL)
-		return (end_connection_error(request, 500, fd));
+		return (end_connection_error(request, INTERNAL_SERVER_ERR, fd));
 
 	if (strcmp(request->path, "/") == 0)
 		if ((complete_path = concat(WEBSITE_FOLDER_PATH, "/index.html")) == NULL)
-			return (end_connection_error(request, 500, fd));
+			return (end_connection_error(request, INTERNAL_SERVER_ERR, fd));
 	if ((file_fd = open(complete_path, O_RDONLY)) < 0)
 	{
 		free(complete_path);
-		return (end_connection_error(request, 500, fd));
+		return (end_connection_error(request, INTERNAL_SERVER_ERR, fd));
 	}
 	if ((content = get_file_content(file_fd, &file_size, complete_path)) == NULL)
 	{
 		free(complete_path);
-		return (end_connection_error(request, 503, fd));
+		return (end_connection_error(request, SERVICE_UNAVAILABLE, fd));
 	}
 	if (strstr(complete_path, ".css") != NULL)
 		dprintf(fd, "HTTP/%s %d OK\nContent-Type: text/css\nConnection: close\nContent-Length: %d\n\n%s", protocol_version(request), reponse, file_size, content);
