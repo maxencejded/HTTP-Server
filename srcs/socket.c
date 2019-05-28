@@ -2,6 +2,7 @@
 
 int			socket_int(void)
 {
+	int					num;
 	int					sock_fd;
 	struct protoent		*proto;
 
@@ -12,7 +13,13 @@ int			socket_int(void)
 	}
 	if ((sock_fd = socket(PF_INET, SOCK_STREAM, proto->p_proto)) == -1)
 	{
-		perror("ERROR: Socket\n");
+		perror("ERROR: Socket");
+		return (-1);
+	}
+	num = 1;
+	if (setsockopt(sock_fd, SOL_SOCKET, SO_REUSEADDR, &num, sizeof(int)) == -1)
+	{
+		perror("ERROR: Setsockopt(SO_REUSEADDR)");
 		return (-1);
 	}
 	return (sock_fd);

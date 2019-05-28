@@ -26,7 +26,7 @@ typedef struct		s_response
  * Environment variables
 */
 
-# define WEBSITE_FOLDER_PATH "website_folder"
+# define WEBSITE_FOLDER_PATH "site"
 
 /*
  * SUCCESS

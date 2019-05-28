@@ -26,6 +26,8 @@ typedef struct		s_http
 	char			*path;
 	uint8_t			protocol;
 
+	uint8_t			content_type;
+
 	uint32_t		content_length;
 	uint8_t			*content;
 }					t_http;

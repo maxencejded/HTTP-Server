@@ -1,5 +1,26 @@
 #include "server.h"
 
+void		header_print(t_http *data)
+{
+	if (data == NULL)
+		return ;
+	if (data->method == 1)
+		printf("METHOD: GET\n");
+	else if (data->method == 2)
+		printf("METHOD: HEAD\n");
+	else if (data->method == 3)
+		printf("METHOD: POST\n");
+	else if (data->method == 4)
+		printf("METHOD: PUT\n");
+	else
+		printf("METHOD: NOT HANDLE\n");
+	printf("PATH: %s\n", data->path);
+	printf("PROTOCOL: %s\n", (data->protocol == 2) ? "HTTP/1.1" : "HTTP/2.0");
+	printf("CONTENT_TYPE: %d\n", data->content_type);
+	printf("CONTENT_LENGTH: %u\n", data->content_length);
+	printf("CONTENT: %s\n", data->content);
+}
+
 int			read_data(int fd)
 {
 	int32_t		size;
@@ -11,19 +32,24 @@ int			read_data(int fd)
 	bzero(buff, BUFF_SOCKET);
 	while ((size = recv(fd, buff, BUFF_SOCKET, 0)) > 0)
 	{
-		write(1, buff, size);
+//		write(1, buff, size);
 		if ((end = strstr((const char *)buff, "\r\n\r\n")) != NULL)
 		{
 			end = end + 4;
 			break ;
 		}
 	}
-	if (end - buff > size)
-		printf("More Data to read: %ld bytes", size - (end - buff));
+	if (size - (end - buff))
+		printf("More Data to read: %ld bytes\n", size - (end - buff));
 	request = header(buff, ((end - 4) - buff));
+	if (request->content_length != 0)
+	{
+		if ((request->content = (uint8_t *)malloc(request->content_length)) == NULL)
+			perror("ERROR: Malloc");
+		memcpy(request->content, end, size - (end - buff));
+	}
+	header_print(request);
 	printf("Reponse value = %d\n", response(request, fd));
-//	write(fd, "HTTP/1.1 200 OK\nContent-Type: text/plain\nConnection: close\nContent-Length: 12\n\nHello world!", 91);
-//	write(fd, "HTTP/1.1 200 OK\nContent-Type: text/html\nConnection: close\nContent-Length: 640\n\n<!DOCTYPE html><html><head><meta charset=\"utf-8\"><script src=\"script.js\"></script><title>Pokequiz</title><link href=\"style.css\" type=\"text/css\" rel=\"stylesheet\"></head><body><h1>Who's that Pokémon ?</h1><div class=\"all\"><img id=\"imgpoke\"><img><p id=\"pokemon_name\"></p><br><div class=\"input\"><select id=\"lang\"><option type=\"radio\" value=\"pokemon_g2_fr\">French</option><option type=\"radio\" value=\"pokemon_g2_en\">English</option></select><input id=\"namepoke\" type=\"text\" placeholder=\"Pokemon name\"></input><input id=\"submit\" type=\"submit\" value=\"Submit\"></input></div><p>Score : <b id=\"score\">0</b>/<b id=\"total\">0</b></p></div></body></html>", 727);
 	http_free(request);
 	return (1);
 }

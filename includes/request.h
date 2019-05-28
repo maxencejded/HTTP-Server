@@ -75,4 +75,16 @@ void				fields_upgrade(char *str, t_http *data);
 void				fields_via(char *str, t_http *data);
 void				fields_warning(char *str, t_http *data);
 
+
+typedef struct		s_post_content
+{
+	char			*name;
+	uint8_t			code;
+}					t_post_content;
+
+# define POST_CONTENT_NUM	3
+# define POST_1		1
+# define POST_2		2
+# define POST_3		3
+
 #endif
