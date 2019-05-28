@@ -24,6 +24,7 @@ static t_reponse	*reponse_init(void)
 		return (NULL);
 	bzero(answer, sizeof(t_reponse));
 	return (answer);
+}
 
 /*
  * Handling bad responses closing the connection
