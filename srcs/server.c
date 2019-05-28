@@ -21,8 +21,9 @@ int			read_data(int fd)
 	if (end - buff > size)
 		printf("More Data to read: %ld bytes", size - (end - buff));
 	request = header(buff, ((end - 4) - buff));
-	//    write(fd, "HTTP/1.1 200 OK\nContent-Type: text/plain\nConnection: close\nContent-Length: 12\n\nHello world!", 91);
-	write(fd, "HTTP/1.1 200 OK\nContent-Type: text/html\nConnection: close\nContent-Length: 640\n\n<!DOCTYPE html><html><head><meta charset=\"utf-8\"><script src=\"script.js\"></script><title>Pokequiz</title><link href=\"style.css\" type=\"text/css\" rel=\"stylesheet\"></head><body><h1>Who's that Pokémon ?</h1><div class=\"all\"><img id=\"imgpoke\"><img><p id=\"pokemon_name\"></p><br><div class=\"input\"><select id=\"lang\"><option type=\"radio\" value=\"pokemon_g2_fr\">French</option><option type=\"radio\" value=\"pokemon_g2_en\">English</option></select><input id=\"namepoke\" type=\"text\" placeholder=\"Pokemon name\"></input><input id=\"submit\" type=\"submit\" value=\"Submit\"></input></div><p>Score : <b id=\"score\">0</b>/<b id=\"total\">0</b></p></div></body></html>", 727);
+	printf("Reponse value = %d\n", response(request, fd));
+//	write(fd, "HTTP/1.1 200 OK\nContent-Type: text/plain\nConnection: close\nContent-Length: 12\n\nHello world!", 91);
+//	write(fd, "HTTP/1.1 200 OK\nContent-Type: text/html\nConnection: close\nContent-Length: 640\n\n<!DOCTYPE html><html><head><meta charset=\"utf-8\"><script src=\"script.js\"></script><title>Pokequiz</title><link href=\"style.css\" type=\"text/css\" rel=\"stylesheet\"></head><body><h1>Who's that Pokémon ?</h1><div class=\"all\"><img id=\"imgpoke\"><img><p id=\"pokemon_name\"></p><br><div class=\"input\"><select id=\"lang\"><option type=\"radio\" value=\"pokemon_g2_fr\">French</option><option type=\"radio\" value=\"pokemon_g2_en\">English</option></select><input id=\"namepoke\" type=\"text\" placeholder=\"Pokemon name\"></input><input id=\"submit\" type=\"submit\" value=\"Submit\"></input></div><p>Score : <b id=\"score\">0</b>/<b id=\"total\">0</b></p></div></body></html>", 727);
 	http_free(request);
 	return (1);
 }

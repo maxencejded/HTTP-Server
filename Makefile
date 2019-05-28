@@ -6,12 +6,12 @@ INCLUDES		= -I includes
 
 BASE			= server.c socket.c
 REQUEST			= request.c method.c splitheader.c
-FILEDS			= fields.c fields_first.c fields_second.c fields_sixth.c fields_fifth.c\
+FIELDS			= fields.c fields_first.c fields_second.c fields_sixth.c fields_fifth.c\
 					fields_fourth.c fields_seventh.c fields_third.c
-RESPONSE		= response.c
-LIBFT			= strsplit.c strdel.c ptrdel.c print_memory.c
+RESPONSE		= response.c protocol.c
+LIBFT			= strsplit.c strdel.c ptrdel.c print_memory.c concat.c
 
-REQUEST_FCT		= $(addprefix request/, $(REQUEST) $(FILEDS))
+REQUEST_FCT		= $(addprefix request/, $(REQUEST) $(FIELDS))
 RESPONSE_FCT	= $(addprefix response/, $(RESPONSE))
 LIBFT_FCT		= $(addprefix libft/, $(LIBFT))
 FUNCTIONS		= $(addprefix srcs/, $(BASE) $(REQUEST_FCT) $(RESPONSE_FCT) $(LIBFT_FCT))

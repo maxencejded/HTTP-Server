@@ -1,0 +1,64 @@
+@font-face {
+	font-family: 'pokemon_solidnormal';
+	src: url('fonts/pokemon_solid-webfont.woff2') format('woff2'),
+		 url('fonts/pokemon_solid-webfont.woff') format('woff');
+	font-weight: normal;
+	font-style: normal;
+}
+body {
+	background: url("http://i.imgur.com/HddtBOT.png")no-repeat center fixed;
+	background-position:left top;
+	background-repeat: no-repeat;
+	-webkit-background-size: cover;
+	-moz-background-size: cover;
+	-o-background-size: cover;
+	background-size: cover;
+}
+h1 {
+	margin: 0;
+	position: fixed;
+	left: 100px;
+	padding: 20px 20px;
+	font-size: 5em;
+	font-family: 'pokemon_solidnormal';
+	color: rgb(247, 204, 70);
+	text-shadow: 6px 6px 0 rgb(66, 94, 162), -6px 6px 0 rgb(66, 94, 162), 6px -6px 0 rgb(66, 94, 162), -6px -6px 0 rgb(66, 94, 162), 0px 6px 0 rgb(66, 94, 162), 0px -6px 0 rgb(66, 94, 162), -6px 0px 0 rgb(66, 94, 162), 6px 0px 0 rgb(66, 94, 162), 8px 8px 0 rgb(66, 94, 162), -8px 8px 0 rgb(66, 94, 162), 8px -8px 0 rgb(66, 94, 162), -8px -8px 0 rgb(66, 94, 162), 0px 8px 0 rgb(66, 94, 162), 0px -8px 0 rgb(66, 94, 162), -8px 0px 0 rgb(66, 94, 162), 8px 0px 0 rgb(66, 94, 162), 6px 8px 0 rgb(66, 94, 162), -6px 8px 0 rgb(66, 94, 162), 6px -8px 0 rgb(66, 94, 162), -6px -8px 0 rgb(66, 94, 162), 8px 6px 0 rgb(66, 94, 162), -8px 6px 0 rgb(66, 94, 162), 8px -6px 0 rgb(66, 94, 162), -8px -6px 0 rgb(66, 94, 162);
+	text-align: center;
+}
+#pokemon_name {
+	margin: 0;
+	position: fixed;
+	top: 22%;
+	left: 30%;
+	font-size: 5em;
+	-webkit-transform: rotate(20deg);
+	padding: 0 80px;
+	font-family: 'pokemon_solidnormal';
+	color: rgb(247, 204, 70);
+	text-shadow: 6px 6px 0 rgb(66, 94, 162), -6px 6px 0 rgb(66, 94, 162), 6px -6px 0 rgb(66, 94, 162), -6px -6px 0 rgb(66, 94, 162), 0px 6px 0 rgb(66, 94, 162), 0px -6px 0 rgb(66, 94, 162), -6px 0px 0 rgb(66, 94, 162), 6px 0px 0 rgb(66, 94, 162), 8px 8px 0 rgb(66, 94, 162), -8px 8px 0 rgb(66, 94, 162), 8px -8px 0 rgb(66, 94, 162), -8px -8px 0 rgb(66, 94, 162), 0px 8px 0 rgb(66, 94, 162), 0px -8px 0 rgb(66, 94, 162), -8px 0px 0 rgb(66, 94, 162), 8px 0px 0 rgb(66, 94, 162), 6px 8px 0 rgb(66, 94, 162), -6px 8px 0 rgb(66, 94, 162), 6px -8px 0 rgb(66, 94, 162), -6px -8px 0 rgb(66, 94, 162), 8px 6px 0 rgb(66, 94, 162), -8px 6px 0 rgb(66, 94, 162), 8px -6px 0 rgb(66, 94, 162), -8px -6px 0 rgb(66, 94, 162);
+}
+.all
+{
+	position: fixed;
+	margin-top: 12%;
+	margin-left: 12%;
+	text-align: center;
+	}
+#imgpoke
+{
+	/* height: 600px; */
+	max-height: 1000px;
+	min-height: 600px;
+	height: auto;
+	width: auto;
+}
+.input {
+	display: block;
+	margin: auto;
+}
+.copyright {
+	position: fixed;
+	color: #fff;
+	bottom: 0;
+	right: 25px;
+}
