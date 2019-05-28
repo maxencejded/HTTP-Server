@@ -73,5 +73,7 @@ typedef struct		s_response
 
 int		response(t_http *request, int fd);
 char	*protocol_version(t_http *request);
+int		check_content_type(t_http *request, char *complete_path);
+char	*get_content_type(t_http *request, char *complete_path);
 
 #endif /* RESPONSE_H */

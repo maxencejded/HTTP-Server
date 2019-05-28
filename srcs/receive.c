@@ -75,7 +75,7 @@ int					receive(int fd)
 
 	if ((size = receive_header(fd, &buf, &end)) < 0)
 		return (0);
-	// write(1, buf, size);
+//	write(1, buf, size);
 	request = header(buf, ((end - 4) - buf));
 	if (request->content_length)
 		if (receive_content(fd, request, end, size - (end - buf)) == 0)
