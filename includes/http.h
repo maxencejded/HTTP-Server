@@ -12,7 +12,7 @@
 
 # define PORT 6060
 # define CONNECTION_NBR 4
-# define BUFF_SOCKET	getpagesize()
+# define BUFF_SOCKET	300 //getpagesize()
 
 // # pragma pack(2)
 
@@ -37,5 +37,8 @@ extern int			sock_fd;
 int					socket_int(void);
 int					socket_bind(int fd, int port, char **address);
 int					socket_accept(int fd, char **address);
+
+void				sigstop(int sig);
+void				sigchld(int sig);
 
 #endif

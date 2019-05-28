@@ -1,29 +1,42 @@
 #include "server.h"
 
-void		header_print(t_http *data)
+void		exit_server(void)
 {
-	if (data == NULL)
-		return ;
-	if (data->method == 1)
-		printf("METHOD: GET\n");
-	else if (data->method == 2)
-		printf("METHOD: HEAD\n");
-	else if (data->method == 3)
-		printf("METHOD: POST\n");
-	else if (data->method == 4)
-		printf("METHOD: PUT\n");
-	else
-		printf("METHOD: NOT HANDLE\n");
-	printf("PATH: %s\n", data->path);
-	printf("PROTOCOL: %s\n", (data->protocol == 2) ? "HTTP/1.1" : "HTTP/2.0");
-	printf("CONTENT_TYPE: %d\n", data->content_type);
-	printf("CONTENT_LENGTH: %u\n", data->content_length);
-	printf("CONTENT: %s\n", data->content);
+	close(sock_fd);
+	exit(EXIT_FAILURE);
 }
 
-int			read_data(int fd)
+// Need to check if total is more than content_length -> Handle error
+int			receive_content(int fd, t_http *data, char *str, ssize_t size)
 {
-	int32_t		size;
+	char		buff[BUFF_SOCKET];
+	uint8_t		*content;
+	ssize_t		total;
+
+	total = size;
+	bzero(buff, BUFF_SOCKET);
+	if ((data->content = (uint8_t *)malloc(sizeof(uint8_t) * data->content_length)) == NULL)
+	{
+		perror("ERROR: Malloc");
+		http_free(data);
+		return (0);
+	}
+	bzero(data->content, sizeof(uint8_t) * data->content_length);
+	content = data->content;
+	memcpy(content, str, size);
+	content = content + size;
+	while (total < data->content_length && (size = recv(fd, buff, BUFF_SOCKET, 0)) > 0)
+	{
+		memcpy(content, buff, size);
+		content = content + size;
+		total += size;
+	}
+	return (1);
+}
+
+int			receive(int fd)
+{
+	ssize_t		size;
 	char		*end;
 	char		buff[BUFF_SOCKET];
 	t_http		*request;
@@ -32,35 +45,25 @@ int			read_data(int fd)
 	bzero(buff, BUFF_SOCKET);
 	while ((size = recv(fd, buff, BUFF_SOCKET, 0)) > 0)
 	{
-//		write(1, buff, size);
+		write(1, buff, size);
 		if ((end = strstr((const char *)buff, "\r\n\r\n")) != NULL)
 		{
 			end = end + 4;
 			break ;
 		}
 	}
-	if (size - (end - buff))
-		printf("More Data to read: %ld bytes\n", size - (end - buff));
+	if (size == -1)
+	{
+		perror("ERROR: Timeout");
+		return (0);
+	}
 	request = header(buff, ((end - 4) - buff));
 	if (request->content_length != 0)
-	{
-		if ((request->content = (uint8_t *)malloc(request->content_length)) == NULL)
-			perror("ERROR: Malloc");
-		memcpy(request->content, end, size - (end - buff));
-	}
-	header_print(request);
+		if (receive_content(fd, request, end, size - (end - buff)) == 0)
+			return (0);
 	printf("Reponse value = %d\n", response(request, fd));
 	http_free(request);
 	return (1);
-}
-
-static void		sigchld(int sig)
-{
-	int	status;
-
-	(void)sig;
-	while (waitpid(-1, &status, WNOHANG) > 0)
-		(void)status;
 }
 
 int				connection_add(int fd, char *address, uint16_t connect)
@@ -69,8 +72,8 @@ int				connection_add(int fd, char *address, uint16_t connect)
 
 	if ((pid = fork()) == 0)
 	{
-		printf("[%d] At Address: %s\n\n", connect, address);
-		read_data(fd);
+		printf("[%d] At Address: %s\n", connect, address);
+		receive(fd);
 		printf("[%d] Close\n", connect);
 		_exit(close(fd));
 	}
@@ -109,13 +112,6 @@ int				loop(int fd)
 	return (1);
 }
 
-static void		sigstop(int sig)
-{
-	(void)sig;
-	printf("Stoping Server\n");
-	exit(close(sock_fd));
-}
-
 int			sock_fd;
 
 int			main(int argc, char **argv)
@@ -123,6 +119,7 @@ int			main(int argc, char **argv)
 	char	*address;
 
 	(void)argv;
+	address = NULL;
 	if (argc != 1)
 	{
 		printf("Usage: ./server\n");
@@ -130,20 +127,14 @@ int			main(int argc, char **argv)
 	}
 	if ((sock_fd = socket_int()) == -1)
 		exit(EXIT_FAILURE);
-	address = NULL;
 	if (socket_bind(sock_fd, PORT, &address) == 0)
-	{
-		close(sock_fd);
-		exit(EXIT_FAILURE);
-	}
+		exit_server();
 	if (listen(sock_fd, CONNECTION_NBR) == -1)
-	{
-		close(sock_fd);
-		exit(EXIT_FAILURE);
-	}
+		exit_server();
 	printf("Starting new Server\nAdrress: %s:%d\n", address, PORT);
 	strdel(&address);
 	signal(SIGINT, sigstop);
 	loop(sock_fd);
+	close(sock_fd);
 	return (0);
 }
