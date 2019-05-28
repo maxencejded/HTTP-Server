@@ -1,80 +1,15 @@
 #include "server.h"
 
-void		exit_server(void)
-{
-	close(sock_fd);
-	exit(EXIT_FAILURE);
-}
-
-// Need to check if total is more than content_length -> Handle error
-int			receive_content(int fd, t_http *data, char *str, ssize_t size)
-{
-	char		buff[BUFF_SOCKET];
-	uint8_t		*content;
-	ssize_t		total;
-
-	total = size;
-	bzero(buff, BUFF_SOCKET);
-	if ((data->content = (uint8_t *)malloc(sizeof(uint8_t) * data->content_length)) == NULL)
-	{
-		perror("ERROR: Malloc");
-		http_free(data);
-		return (0);
-	}
-	bzero(data->content, sizeof(uint8_t) * data->content_length);
-	content = data->content;
-	memcpy(content, str, size);
-	content = content + size;
-	while (total < data->content_length && (size = recv(fd, buff, BUFF_SOCKET, 0)) > 0)
-	{
-		memcpy(content, buff, size);
-		content = content + size;
-		total += size;
-	}
-	return (1);
-}
-
-int			receive(int fd)
-{
-	ssize_t		size;
-	char		*end;
-	char		buff[BUFF_SOCKET];
-	t_http		*request;
-
-	size = 0;
-	bzero(buff, BUFF_SOCKET);
-	while ((size = recv(fd, buff, BUFF_SOCKET, 0)) > 0)
-	{
-		write(1, buff, size);
-		if ((end = strstr((const char *)buff, "\r\n\r\n")) != NULL)
-		{
-			end = end + 4;
-			break ;
-		}
-	}
-	if (size == -1)
-	{
-		perror("ERROR: Timeout");
-		return (0);
-	}
-	request = header(buff, ((end - 4) - buff));
-	if (request->content_length)
-		if (receive_content(fd, request, end, size - (end - buff)) == 0)
-			return (0);
-	printf("Reponse value = %d\n", response(request, fd));
-	http_free(request);
-	return (1);
-}
-
 int				connection_add(int fd, char *address, uint16_t connect)
 {
+	int			response;
 	pid_t		pid;
 
 	if ((pid = fork()) == 0)
 	{
 		printf("[%d] At Address: %s\n", connect, address);
-		receive(fd);
-		printf("[%d] Close\n", connect);
+		response = receive(fd);
+		printf("[%d] Close with status: %d\n", connect, response);
 		_exit(close(fd));
 	}
 	else if (pid < 0)
@@ -103,11 +38,10 @@ int				loop(int fd)
 		close(sock_new);
 		++connect;
 	}
-	close(fd);
 	if (sock_new == -1)
 	{
 		perror("ERROR: Accept");
-		exit(EXIT_FAILURE);
+		exit_server();
 	}
 	return (1);
 }
@@ -136,5 +70,6 @@ int			main(int argc, char **argv)
 	signal(SIGINT, sigstop);
 	if (loop(sock_fd) == 0)
 		exit_server();
+	close(sock_fd);
 	return (0);
 }

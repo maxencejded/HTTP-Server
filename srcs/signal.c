@@ -1,5 +1,11 @@
 #include "server.h"
 
+void		exit_server(void)
+{
+	close(sock_fd);
+	exit(EXIT_FAILURE);
+}
+
 void		sigstop(int sig)
 {
 	(void)sig;

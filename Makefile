@@ -4,7 +4,7 @@ SERVER			= server
 CFLAGS			= -Wall -Wextra -Werror -g
 INCLUDES		= -I includes
 
-BASE			= server.c socket.c signal.c
+BASE			= server.c socket.c receive.c signal.c
 REQUEST			= request.c method.c splitheader.c
 FIELDS			= fields.c fields_first.c fields_second.c fields_sixth.c fields_fifth.c\
 					fields_fourth.c fields_seventh.c fields_third.c
