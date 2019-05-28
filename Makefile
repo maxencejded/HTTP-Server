@@ -9,7 +9,7 @@ REQUEST			= request.c method.c splitheader.c
 FIELDS			= fields.c fields_first.c fields_second.c fields_sixth.c fields_fifth.c\
 					fields_fourth.c fields_seventh.c fields_third.c
 RESPONSE		= response.c protocol.c
-LIBFT			= strsplit.c strdel.c ptrdel.c print_memory.c concat.c
+LIBFT			= strsplit.c strdel.c ptrdel.c print_memory.c concat.c get_file_content.c
 
 REQUEST_FCT		= $(addprefix request/, $(REQUEST) $(FIELDS))
 RESPONSE_FCT	= $(addprefix response/, $(RESPONSE))
