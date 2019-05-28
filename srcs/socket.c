@@ -46,6 +46,7 @@ int			socket_accept(int fd, char **address)
 {
 	int					sock;
 	socklen_t			sock_len;
+	struct timeval		timeout;      
 	struct sockaddr_in	sock_init;
 
 	sock_len = sizeof(struct sockaddr_in);
@@ -54,6 +55,13 @@ int			socket_accept(int fd, char **address)
 	if (sock == -1)
 	{
 		perror("ERROR: Accept");
+		return (-1);
+	}
+	bzero(&timeout, sizeof(struct timeval));
+    timeout.tv_sec = 10;
+	if (setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(struct timeval)) == -1)
+	{
+		perror("ERROR: Setsockopt(SO_RCVTIMEO)");
 		return (-1);
 	}
 	*address = strdup(inet_ntoa(sock_init.sin_addr));

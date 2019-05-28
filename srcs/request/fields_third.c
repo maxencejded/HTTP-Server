@@ -27,12 +27,11 @@ void				fields_content_type(char *str, t_http *data)
 		{
 			if (strncmp(str, content_type[i].name, strlen(content_type[i].name)) == 0)
 			{
-				data->content_type = i;
+				data->content_type = i + 1;
 				break ;
 			}
 			++i;
 		}
-		// Read the data
 	}
 }
 
