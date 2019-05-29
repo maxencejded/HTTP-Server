@@ -69,7 +69,7 @@ int				check_content_type(t_http *request, char *complete_path)
 	i = -1;
 	while (complete_path[++i] != '\0')
 		;
-	while (complete_path[--i] != '/')
+	while (complete_path[--i] != '.')
 		;
 	i += 1;
 	if ((file_extension = strdup(&complete_path[i])) == NULL)
@@ -107,12 +107,13 @@ char			*get_content_type(t_http *request, char *complete_path)
 	int			i, n;
 
 	n = strlen(complete_path);
-	while (complete_path[--n] != '/')
+	while (complete_path[--n] != '.')
 		;
 	n += 1;
 	if ((file_extension = strdup(&complete_path[n])) == NULL)
 		return (NULL);
 	i = -1;
+//	printf("My file extension: [%s] vs [%s]\n", file_extension, request->accept);
 	while (strncmp(file_extension, &request->accept[++i], strlen(file_extension)) != 0)
 		if (request->accept[i] == '*')
 			break ;
