@@ -124,19 +124,19 @@ static int			end_connection_error(t_http *request, int reponse, int fd, t_repons
 	answer->protocol = strdup(protocol_version(request));
 	answer->fd = fd;
 	sprintf(str, "%d", reponse);
-	if ((answer->complete_path = concat(ERROR_FOLDER_PATH, str)) == NULL)
+	if ((answer->complete_path = concat(ERROR_FOLDER_PATH, str)) == NULL && http_free(request) == 1)
 		return (write_connection_error(answer));
-	if ((answer->complete_path = concat(answer->complete_path, ".html")) == NULL)
+	if ((answer->complete_path = concat(answer->complete_path, ".html")) == NULL && http_free(request) == 1)
 		return (write_connection_error(answer));
-	if ((answer->file_fd = open(answer->complete_path, O_RDONLY)) < 0)
+	if ((answer->file_fd = open(answer->complete_path, O_RDONLY)) < 0 && http_free(request) == 1)
 		return (write_connection_error(answer));
-	if ((get_file_content(&answer->file_size, answer->complete_path)) < 0)
+	if ((get_file_content(&answer->file_size, answer->complete_path)) < 0 && http_free(request) == 1)
 		return (write_connection_error(answer));
-	if (check_content_type(request, answer->complete_path) != 0)
+	if (check_content_type(request, answer->complete_path) != 0 && http_free(request) == 1)
 		return (write_connection_error(answer));
-	if ((answer->content_type = get_content_type(request, answer->complete_path)) == NULL)
+	if ((answer->content_type = get_content_type(request, answer->complete_path)) == NULL && http_free(request) == 1)
 		return (write_connection_error(answer));
-	if ((answer->date = get_date()) == NULL)
+	if ((answer->date = get_date()) == NULL && http_free(request) == 1)
 		return (write_connection_error(answer));
 	write_connection_error(answer);
 	return (reponse);
@@ -199,7 +199,30 @@ static int			end_connection_success(t_http *request, int reponse, int fd, t_repo
 		return (end_connection_error(request, INTERNAL_SERVER_ERR, fd, answer));
 	write_connection_success(answer);
 	reponse_free(answer);
+	http_free(request);
 	return (reponse);
+}
+
+/*
+ * Function which can be called by the server to print an error
+*/
+
+int				create_partial_answer(int fd, t_http *request, int reponse)
+{
+	t_reponse	*answer;
+
+	if ((answer = reponse_init()) == NULL || !request)
+	{
+		dprintf(fd, "HTTP/1.0 500 Internal Server Error\r\n\r\n");
+		close (fd);
+		return (INTERNAL_SERVER_ERR);
+	}
+	answer->fd = fd;
+	answer->reponse = reponse;
+	answer->protocol = strdup(protocol_version(request));
+	answer->date = get_date();
+	http_free(request);
+	return (write_connection_error(answer));
 }
 
 /*

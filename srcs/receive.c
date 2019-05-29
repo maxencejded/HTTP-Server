@@ -16,7 +16,7 @@ static int			receive_content(int fd, t_http *data, uint8_t *str, ssize_t size)
 	{
 		// Send Response: "500 Internal Server Error"
 		printf("ERROR: '500 Internal Server Error'\n");
-		http_free(data);
+		create_partial_answer(fd, data, INTERNAL_SERVER_ERR);
 		return (500);
 	}
 	bzero(data->content, sizeof(uint8_t) * data->content_length);
@@ -34,7 +34,7 @@ static int			receive_content(int fd, t_http *data, uint8_t *str, ssize_t size)
 	{
 		// Send Response: "400 Bad Request"
 		printf("ERROR: '400 Bad Request'\n");
-		http_free(data);
+		create_partial_answer(fd, data, BAD_REQUEST);
 		return (400);
 	}
 	return (202);
@@ -74,7 +74,7 @@ static ssize_t		receive_header(int fd, uint8_t **header, uint8_t **end, int *sta
 		{
 			// Send Response: "413 Entity Too Large"
 			printf("ERROR: '413 Entity Too Large'\n");
-			*status = 413;
+			*status = create_partial_answer(fd, NULL, ENTITY_TOO_LARGE);
 			return (-1);
 		}	
 	}
@@ -82,21 +82,21 @@ static ssize_t		receive_header(int fd, uint8_t **header, uint8_t **end, int *sta
 	{
 		// Send Response: "204 No Content"
 		printf("ERROR: '204 No Content'\n");
-		*status = 204;
+		*status = create_partial_answer(fd, NULL, NO_CONTENT);
 		return (0);
 	}
 	else
 	{
 		// Send Response: "408 Request Time-out"
 		perror("ERROR: '408 Request Time-out'");
-		*status = 408;
+		*status = create_partial_answer(fd, NULL, REQUEST_TIME_OUT);
 		return (-1);
 	}
 	if (header_malloc(buff, header, end, size) == 0)
 	{
 		// Send Response: "500 Internal Server Error"
 		printf("ERROR: '500 Internal Server Error'\n");
-		*status = 500;
+		*status = create_partial_answer(fd, NULL, INTERNAL_SERVER_ERR);
 		return (-1);
 	}
 	return (size);
@@ -130,6 +130,5 @@ int					receive(int fd, int *status)
 	}
 	free(buf);
 	*status = response(request, fd);
-	http_free(request);
 	return (1);
 }

@@ -61,6 +61,8 @@ typedef struct		s_response
 # define FORBIDDEN 403
 # define NOT_FOUND 404
 # define METHOD_NOT_ALLOWED 405
+# define REQUEST_TIME_OUT 408
+# define ENTITY_TOO_LARGE 413
 
 /*
  * Server Error
@@ -79,5 +81,6 @@ int		response(t_http *request, int fd);
 char	*protocol_version(t_http *request);
 int		check_content_type(t_http *request, char *complete_path);
 char	*get_content_type(t_http *request, char *complete_path);
+int		create_partial_answer(int fd, t_http *data, int reponse);
 
 #endif /* RESPONSE_H */
