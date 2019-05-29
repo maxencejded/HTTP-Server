@@ -20,9 +20,7 @@ typedef struct		s_method
 
 int					http_free(t_http *data);
 
-char				**splitheader(char *str);
-
-t_http				*header(char *request, int *status);
+t_http				*header(int fd, char *request, int *status);
 uint8_t		        method(char *method, t_http *data);
 
 typedef struct		s_fields

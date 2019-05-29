@@ -29,49 +29,48 @@ typedef struct		s_response
  * Environment variables
 */
 
-# define WEBSITE_FOLDER_PATH "site"
-# define ERROR_FOLDER_PATH "error_pages/"
+# define WEBSITE_FOLDER_PATH	"site"
+# define ERROR_FOLDER_PATH		"error_pages/"
 
 /*
  * SUCCESS
 */
 
-# define OK 200
-# define CREATED 201
-# define ACCEPTED 202
-# define NO_CONTENT 204
-# define PARTIAL_CONTENT 206
+# define OK						200
+# define CREATED				201
+# define ACCEPTED				202
+# define NO_CONTENT				204
+# define PARTIAL_CONTENT		206
 
 /*
  * Redirections
 */
 
-# define MULTIPLE_CHOICES 300
-# define MOVED_DEF 301
-# define MOVED_TMP 302
-# define REDIR_DEF 308
+# define MULTIPLE_CHOICES		300
+# define MOVED_PERMANENTLY		301
+# define FOUND					302
+# define PERMANENT_REDIRECT		308
 
 /*
  * Request Error
 */
 
-# define BAD_REQUEST 400
-# define UNAUTHORIZED 401
-# define PAYMENT_REQ 402
-# define FORBIDDEN 403
-# define NOT_FOUND 404
-# define METHOD_NOT_ALLOWED 405
-# define REQUEST_TIME_OUT 408
-# define ENTITY_TOO_LARGE 413
+# define BAD_REQUEST			400
+# define UNAUTHORIZED			401
+# define FORBIDDEN				403
+# define NOT_FOUND				404
+# define METHOD_NOT_ALLOWED		405
+# define REQUEST_TIME_OUT		408
+# define ENTITY_TOO_LARGE		413
 
 /*
  * Server Error
 */
 
-# define INTERNAL_SERVER_ERR 500
-# define NOT_IMPLEMENTED 501
-# define BAD_GATEWAY 502
-# define SERVICE_UNAVAILABLE 503
+# define INTERNAL_SERVER_ERROR	500
+# define NOT_IMPLEMENTED		501
+# define BAD_GATEWAY 			502
+# define SERVICE_UNAVAILABLE	503
 
 /*
  * Response function definition

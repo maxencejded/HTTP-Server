@@ -1,7 +1,7 @@
 CC				= gcc
 RM				= rm -f
 SERVER			= server
-CFLAGS			= -Wall -Wextra -Werror -g
+CFLAGS			= -Wall -Wextra -Werror -g -fsanitize=address -fsanitize=undefined
 INCLUDES		= -I includes
 
 BASE			= server.c socket.c receive.c signal.c

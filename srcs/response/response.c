@@ -193,12 +193,12 @@ static int			end_connection_success(t_http *request, int reponse, int fd, t_repo
 	answer->fd = fd;
 	ft_free(answer->complete_path);
 	if ((answer->complete_path = concat(WEBSITE_FOLDER_PATH, request->path)) == NULL)
-		return (end_connection_error(request, INTERNAL_SERVER_ERR, fd, answer));
+		return (end_connection_error(request, INTERNAL_SERVER_ERROR, fd, answer));
 	if (!request->path || request->path[0] == '\0' || strcmp(request->path, "/") == 0)
 		if (ft_free(answer->complete_path) == 0 && (answer->complete_path = concat(WEBSITE_FOLDER_PATH, "/index.html")) == NULL)
-			return (end_connection_error(request, INTERNAL_SERVER_ERR, fd, answer));
+			return (end_connection_error(request, INTERNAL_SERVER_ERROR, fd, answer));
 	if ((answer->file_fd = open(answer->complete_path, O_RDONLY)) < 0)
-		return (end_connection_error(request, INTERNAL_SERVER_ERR, fd, answer));
+		return (end_connection_error(request, INTERNAL_SERVER_ERROR, fd, answer));
 	if ((get_file_content(&answer->file_size, answer->complete_path)) < 0)
 		return (end_connection_error(request, SERVICE_UNAVAILABLE, fd, answer));
 	if (check_content_type(request, answer->complete_path) != 0)
@@ -206,7 +206,7 @@ static int			end_connection_success(t_http *request, int reponse, int fd, t_repo
 	if ((answer->content_type = get_content_type(request, answer->complete_path)) == NULL)
 		return (end_connection_error(request, BAD_REQUEST, fd, answer));
 	if ((answer->date = get_date()) == NULL)
-		return (end_connection_error(request, INTERNAL_SERVER_ERR, fd, answer));
+		return (end_connection_error(request, INTERNAL_SERVER_ERROR, fd, answer));
 	write_connection_success(answer);
 	reponse_free(answer);
 	http_free(request);
@@ -221,11 +221,11 @@ int				create_partial_answer(int fd, t_http *request, int reponse)
 {
 	t_reponse	*answer;
 
-	if (reponse == INTERNAL_SERVER_ERR || (answer = reponse_init()) == NULL)
+	if (reponse == INTERNAL_SERVER_ERROR || (answer = reponse_init()) == NULL)
 	{
 		dprintf(fd, "HTTP/1.0 500 Internal Server Error\r\n\r\n");
 		close (fd);
-		return (INTERNAL_SERVER_ERR);
+		return (INTERNAL_SERVER_ERROR);
 	}
 	answer->fd = fd;
 	answer->reponse = reponse;
@@ -249,7 +249,7 @@ int		response(t_http *request, int fd)
 	if (!request)
 		return (end_connection_error(request, BAD_REQUEST, fd, NULL));
 	if ((answer = reponse_init()) == NULL)
-		return (end_connection_error(request, INTERNAL_SERVER_ERR, fd, NULL));
+		return (end_connection_error(request, INTERNAL_SERVER_ERROR, fd, NULL));
 	answer->fd = fd;
 	if ((request->method < 0 || request->method > 4))
 		return (end_connection_error(request, NOT_IMPLEMENTED, fd, answer));

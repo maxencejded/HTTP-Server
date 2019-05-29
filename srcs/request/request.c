@@ -43,7 +43,7 @@ static uint32_t		header_next(char *str)
 	return (i);
 }
 
-t_http				*header(char *request, int *status)
+t_http				*header(int fd, char *request, int *status)
 {
 	uint32_t		index;
 	t_http		*header;
@@ -52,18 +52,13 @@ t_http				*header(char *request, int *status)
 		return (NULL);
 	if ((header = http_init()) == NULL)
 	{
-		// Send Response: "500 Internal Server Error"
-		printf("ERROR: '500 Internal Server Error'\n");
-		*status = 500;
+		*status = create_partial_answer(fd, NULL, INTERNAL_SERVER_ERROR);
 		return (NULL);
 	}
 	index = header_next(request);
 	if (method(request, header) == 0)
 	{
-		// Send Response: "501 Not Implemented"
-		printf("ERROR: '501 Not Implemented'\n");
-		http_free(header);
-		*status = 501;
+		*status = create_partial_answer(fd, header, NOT_IMPLEMENTED);
 		return (NULL);
 	}
 	request = request + index;

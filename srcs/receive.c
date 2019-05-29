@@ -13,7 +13,7 @@ static int			receive_content(int fd, t_http *data, uint8_t *str, ssize_t size)
 
 	total = size;
 	if ((data->content = (uint8_t *)malloc(sizeof(uint8_t) * data->content_length)) == NULL)
-		return (create_partial_answer(fd, data, INTERNAL_SERVER_ERR));
+		return (create_partial_answer(fd, data, INTERNAL_SERVER_ERROR));
 	bzero(data->content, sizeof(uint8_t) * data->content_length);
 	memcpy(data->content, str, size);
 	content = data->content + size;
@@ -66,12 +66,13 @@ static ssize_t		receive_header(int fd, uint8_t **header, uint8_t **end, int *sta
 			return (-1);
 		}
 	}
-	else if (size == 0)
-		*status = create_partial_answer(fd, NULL, NO_CONTENT);
 	else
-		*status = create_partial_answer(fd, NULL, REQUEST_TIME_OUT);
+	{
+		*status = create_partial_answer(fd, NULL, (size == 0) ? NO_CONTENT : REQUEST_TIME_OUT);
+		return (-1);
+	}
 	if (header_malloc(buff, header, end, size) == 0)
-		*status = create_partial_answer(fd, NULL, INTERNAL_SERVER_ERR);
+		*status = create_partial_answer(fd, NULL, INTERNAL_SERVER_ERROR);
 	if (*status != 200)
 		return ((size == 0) ? 0 : -1);
 	return (size);
@@ -92,8 +93,8 @@ int					receive(int fd, int *status)
 	buf = NULL;
 	if ((size = receive_header(fd, &buf, &end, status)) <= 0)
 		return (0);
-	// write(1, buf, (end - buf));
-	if ((request = header((char *)buf, status)) == NULL)
+	// write(1, buf, (end - buf));	
+	if ((request = header(fd, (char *)buf, status)) == NULL)
 		return (0);
 	if (request && request->content_length)
 	{
