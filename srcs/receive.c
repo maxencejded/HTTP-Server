@@ -12,7 +12,7 @@ static int			receive_content(int fd, t_http *data, char *str, ssize_t size)
 		// Send Response: "500 Internal Server Error"
 		printf("ERROR: '500 Internal Server Error'\n");
 		http_free(data);
-		return (0);
+		return (500);
 	}
 	bzero(data->content, sizeof(uint8_t) * data->content_length);
 	memcpy(data->content, str, size);
@@ -28,22 +28,24 @@ static int			receive_content(int fd, t_http *data, char *str, ssize_t size)
 		// Send Response: "400 Bad Request"
 		printf("ERROR: '400 Bad Request'\n");
 		http_free(data);
-		return (0);
+		return (400);
 	}
-	return (1);
+	return (202);
 }
 
-static ssize_t		receive_header(int fd, char **header, char **end)
+static ssize_t		receive_header(int fd, char **header, char **end, int *status)
 {
 	ssize_t		size;
 	char		buff[BUFF_SOCKET];
 
-	if ((size = recv(fd, buff, BUFF_SOCKET, 0)) > 0)
+	bzero(buff, BUFF_SOCKET);
+	if ((size = recv(fd, buff, BUFF_SOCKET - 1, 0)) > 0)
 	{
 		if (strstr((const char *)buff, "\r\n\r\n") == NULL)
 		{
 			// Send Response: "413 Entity Too Large"
 			printf("ERROR: '413 Entity Too Large'\n");
+			*status = 413;
 			return (-1);
 		}	
 	}
@@ -51,12 +53,14 @@ static ssize_t		receive_header(int fd, char **header, char **end)
 	{
 		// Send Response: "204 No Content"
 		printf("ERROR: '204 No Content'\n");
+		*status = 204;
 		return (0);
 	}
 	else
 	{
 		// Send Response: "408 Request Time-out"
 		perror("ERROR: '408 Request Time-out'");
+		*status = 408;
 		return (-1);
 	}
 	*header = strndup(buff, size);
@@ -65,28 +69,28 @@ static ssize_t		receive_header(int fd, char **header, char **end)
 	return (size);
 }
 
-int					receive(int fd)
+int					receive(int fd, int *status)
 {
 	ssize_t		size;
-	int 		status;
 	char		*buf;
 	char		*end;
 	t_http		*request;
 
-	if ((size = receive_header(fd, &buf, &end)) < 0)
+	buf = NULL;
+	if ((size = receive_header(fd, &buf, &end, status)) <= 0)
 		return (0);
 	// write(1, buf, size);
 	request = header(buf);
-	if (request->content_length)
+	if (request && request->content_length)
 	{
-		if (receive_content(fd, request, end, size - (end - buf)) == 0)
+		if ((*status = receive_content(fd, request, end, size - (end - buf))) != 202)
 		{
 			strdel(&buf);
 			return (0);
 		}
 	}
 	strdel(&buf);
-	status = response(request, fd);
+	*status = response(request, fd);
 	http_free(request);
-	return (status);
+	return (1);
 }

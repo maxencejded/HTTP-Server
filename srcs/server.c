@@ -8,7 +8,7 @@ int				connection_add(int fd, char *address, uint16_t connect)
 	// if ((pid = fork()) == 0)
 	// {
 		printf("[%d] At Address: %s\n", connect, address);
-		response = receive(fd);
+		receive(fd, &response);
 		printf("[%d] Close with status: %d\n", connect, response);
 		close(fd);
 		// _exit(close(fd));

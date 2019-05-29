@@ -39,7 +39,7 @@ int					socket_int(void);
 int					socket_bind(int fd, int port, char **address);
 int					socket_accept(int fd, char **address);
 
-int					receive(int fd);
+int					receive(int fd, int *status);
 
 void				exit_server(void);
 void				sigstop(int sig);

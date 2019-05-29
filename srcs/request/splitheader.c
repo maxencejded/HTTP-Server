@@ -36,6 +36,8 @@ char			**splitheader(char *str)
 	size_t	size;
 	char	**tab;
 
+	if (str == NULL)
+		return (NULL);
 	size = wordnumber(str);
 	if (!(tab = (char **)malloc(sizeof(char *) * (size + 1))))
 		return (NULL);

@@ -27,6 +27,8 @@ t_http			*header(char *request)
 	char		**fields;
 	t_http		*header;
 
+	if (request == NULL)
+		return (NULL);
 	if ((header = http_init()) == NULL)
 		return (NULL);
 	if ((fields = splitheader(request)) == NULL)
