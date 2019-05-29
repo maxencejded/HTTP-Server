@@ -66,15 +66,19 @@ static t_reponse	*reponse_init(void)
 }
 
 /*
- * Allowing me to free a char* while returning an int
- * Mostly used in error handling to free the complete path
+ * print the reponse message linked to the value
 */
 
-static int		ft_free(void *path)
+static char		*get_reponse_message(int reponse)
 {
-	if (path)
-		free(path);
-	return (0);
+	if (reponse < 300)
+		return ("Success connecting");
+	else if (reponse < 400)
+		return ("Redirection");
+	else if (reponse < 500)
+		return ("Request Error");
+	else
+		return ("Server Error");
 }
 
 /*
@@ -86,10 +90,21 @@ static int			write_connection_error(t_reponse *answer)
 {
 	int		size;
 	int		reponse;
-	char	buff[4096];
+	char	buff[PAGE_SIZE];
 
-	dprintf(answer->fd, "HTTP/%s %d Error\r\nDate: %s\r\nServer: Mine\r\nLast Modified: %s\r\nContent-Type: %s\r\nConnection: close\r\nContent-Length: %lld\r\n\r\n", answer->protocol, answer->reponse, answer->date, answer->date, answer->content_type, answer->file_size);
-	while ((size = read(answer->file_fd, buff, 4096)) > 0)
+	if (answer->protocol)
+		dprintf(answer->fd, "HTTP/%s ", answer->protocol);
+	if (answer->reponse)
+		dprintf(answer->fd, "%d %s\r\n", answer->reponse, get_reponse_message(answer->reponse));
+	if (answer->date)
+		dprintf(answer->fd, "Date: %s\r\n", answer->date);
+	if (answer->date)
+		dprintf(answer->fd, "Last Modified: %s\r\n", answer->date);
+	if (answer->content_type)
+		dprintf(answer->fd, "Content-Type: %s\r\n", answer->content_type);
+	if (answer->file_size)
+		dprintf(answer->fd, "Content-Length: %lld\r\n\r\n", answer->file_size);
+	while ((size = read(answer->file_fd, buff, PAGE_SIZE)) > 0)
 		write(answer->fd, buff, size);
 	reponse = answer->reponse;
 	reponse_free(answer);
@@ -124,7 +139,6 @@ static int			end_connection_error(t_http *request, int reponse, int fd, t_repons
 	if ((answer->date = get_date()) == NULL)
 		return (write_connection_error(answer));
 	write_connection_error(answer);
-	reponse_free(answer);
 	return (reponse);
 }
 
@@ -136,10 +150,21 @@ static int			end_connection_error(t_http *request, int reponse, int fd, t_repons
 static void			write_connection_success(t_reponse *answer)
 {
 	int		size;
-	char	buff[4096];
+	char	buff[PAGE_SIZE];
 
-	dprintf(answer->fd, "HTTP/%s %d OK\r\nDate: %s\r\nServer: Mine\r\nLast Modified: %s\r\nContent-Type: %s\r\nConnection: close\r\nContent-Length: %lld\r\n\r\n", answer->protocol, answer->reponse, answer->date, answer->date, answer->content_type, answer->file_size - 1);
-	while ((size = read(answer->file_fd, buff, 4096)) > 0)
+	if (answer->protocol)
+		dprintf(answer->fd, "HTTP/%s ", answer->protocol);
+	if (answer->reponse)
+		dprintf(answer->fd, "%d %s\r\n", answer->reponse, get_reponse_message(answer->reponse));
+	if (answer->date)
+		dprintf(answer->fd, "Date: %s\r\n", answer->date);
+	if (answer->date)
+		dprintf(answer->fd, "Last Modified: %s\r\n", answer->date);
+	if (answer->content_type)
+		dprintf(answer->fd, "Content-Type: %s\r\n", answer->content_type);
+	if (answer->file_size)
+		dprintf(answer->fd, "Content-Length: %lld\r\n\r\n", answer->file_size);
+	while ((size = read(answer->file_fd, buff, PAGE_SIZE)) > 0)
 		write(answer->fd, buff, size);
 }
 
@@ -187,16 +212,14 @@ int		response(t_http *request, int fd)
 	struct stat		sb;
 	t_reponse		*answer;
 
-	(void)ft_free;
 	if (!request)
 		return (end_connection_error(request, BAD_REQUEST, fd, NULL));
 	if ((answer = reponse_init()) == NULL)
 		return (end_connection_error(request, INTERNAL_SERVER_ERR, fd, NULL));
 	answer->fd = fd;
-	if ((request->method < 0 || request->method > 4) && reponse_free(answer) == 0)
-		return (end_connection_error(request, NOT_IMPLEMENTED, fd, NULL));
-	if ((!request->path || stat(concat(WEBSITE_FOLDER_PATH, request->path), &sb) == -1)
-			&& reponse_free(answer) == 0)
-		return (end_connection_error(request, NOT_FOUND, fd, NULL));
+	if ((request->method < 0 || request->method > 4))
+		return (end_connection_error(request, NOT_IMPLEMENTED, fd, answer));
+	if ((!request->path || stat(concat(WEBSITE_FOLDER_PATH, request->path), &sb) == -1))
+		return (end_connection_error(request, NOT_FOUND, fd, answer));
 	return (end_connection_success(request, OK, fd, answer));
 }

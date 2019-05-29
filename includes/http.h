@@ -13,6 +13,7 @@
 # define PORT 6060
 # define CONNECTION_NBR 4
 # define BUFF_SOCKET	getpagesize()
+# define PAGE_SIZE		getpagesize()
 
 // # pragma pack(2)
 
