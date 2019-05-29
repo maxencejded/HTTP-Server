@@ -22,7 +22,7 @@ void				http_free(t_http *data);
 
 char				**splitheader(char *str);
 
-t_http				*header(char *request, int32_t size);
+t_http				*header(char *request);
 uint8_t		        method(char *method, t_http *data);
 
 typedef struct		s_fields

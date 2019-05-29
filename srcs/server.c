@@ -3,21 +3,22 @@
 int				connection_add(int fd, char *address, uint16_t connect)
 {
 	int			response;
-	pid_t		pid;
+	// pid_t		pid;
 
-	if ((pid = fork()) == 0)
-	{
+	// if ((pid = fork()) == 0)
+	// {
 		printf("[%d] At Address: %s\n", connect, address);
 		response = receive(fd);
 		printf("[%d] Close with status: %d\n", connect, response);
-		_exit(close(fd));
-	}
-	else if (pid < 0)
-	{
-		perror("ERROR: Fork");
-		strdel(&address);
-		return (0);
-	}
+		close(fd);
+		// _exit(close(fd));
+	// }
+	// else if (pid < 0)
+	// {
+	// 	perror("ERROR: Fork");
+	// 	strdel(&address);
+	// 	return (0);
+	// }
 	strdel(&address);
 	return (1);
 }
@@ -52,9 +53,8 @@ int			main(int argc, char **argv)
 {
 	char	*address;
 
-	(void)argv;
 	address = NULL;
-	if (argc != 1)
+	if (argc != 1 && argv[1] == NULL)
 	{
 		printf("Usage: ./server\n");
 		exit(EXIT_FAILURE);

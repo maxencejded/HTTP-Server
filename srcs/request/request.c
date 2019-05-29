@@ -21,7 +21,7 @@ void			http_free(t_http *data)
 	data = NULL;
 }
 
-t_http			*header(char *request, int32_t size)
+t_http			*header(char *request)
 {
 	uint8_t		i;
 	char		**fields;
@@ -29,7 +29,6 @@ t_http			*header(char *request, int32_t size)
 
 	if ((header = http_init()) == NULL)
 		return (NULL);
-	request[size] = '\0';
 	if ((fields = splitheader(request)) == NULL)
 		return (NULL);
 	if (fields[0] == NULL || method(fields[0], header) == 0)

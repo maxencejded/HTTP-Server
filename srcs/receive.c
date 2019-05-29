@@ -40,9 +40,7 @@ static ssize_t		receive_header(int fd, char **header, char **end)
 
 	if ((size = recv(fd, buff, BUFF_SOCKET, 0)) > 0)
 	{
-		if ((*end = strstr((const char *)buff, "\r\n\r\n")) != NULL)
-			*end = *end + 4;
-		else
+		if (strstr((const char *)buff, "\r\n\r\n") == NULL)
 		{
 			// Send Response: "413 Entity Too Large"
 			printf("ERROR: '413 Entity Too Large'\n");
@@ -61,7 +59,9 @@ static ssize_t		receive_header(int fd, char **header, char **end)
 		perror("ERROR: '408 Request Time-out'");
 		return (-1);
 	}
-	*header = buff;
+	*header = strndup(buff, size);
+	*end = strstr((const char *)*header, "\r\n\r\n");
+	*end = *end + 4;
 	return (size);
 }
 
@@ -75,11 +75,17 @@ int					receive(int fd)
 
 	if ((size = receive_header(fd, &buf, &end)) < 0)
 		return (0);
-//	write(1, buf, size);
-	request = header(buf, ((end - 4) - buf));
+	// write(1, buf, size);
+	request = header(buf);
 	if (request->content_length)
+	{
 		if (receive_content(fd, request, end, size - (end - buf)) == 0)
+		{
+			strdel(&buf);
 			return (0);
+		}
+	}
+	strdel(&buf);
 	status = response(request, fd);
 	http_free(request);
 	return (status);
