@@ -10,14 +10,15 @@ static t_http		*http_init(void)
 	return (data);
 }
 
-void				http_free(t_http *data)
+int					http_free(t_http *data)
 {
 	if (data == NULL)
-		return ;
+		return (1);
 	free(data->path);
 	free(data->accept);
 	free(data->content);
 	free(data);
+	return (1);
 }
 
 static uint32_t		header_next(char *str)

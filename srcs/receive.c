@@ -1,5 +1,10 @@
 #include "server.h"
 
+/*
+ * Read the content send through the header.
+ * 
+ * If successful, return OK. Otherwise, an appropriate code error is returned.
+*/
 static int			receive_content(int fd, t_http *data, uint8_t *str, ssize_t size)
 {
 	uint8_t		buff[BUFF_SOCKET];
@@ -19,9 +24,11 @@ static int			receive_content(int fd, t_http *data, uint8_t *str, ssize_t size)
 	content = data->content + size;
 	while (total < data->content_length && (size = recv(fd, buff, BUFF_SOCKET, 0)) > 0)
 	{
+		total += size;
+		if (total > data->content_length)
+			break ;
 		memcpy(content, buff, size);
 		content = content + size;
-		total += size;
 	}
 	if (total != data->content_length)
 	{
@@ -33,17 +40,28 @@ static int			receive_content(int fd, t_http *data, uint8_t *str, ssize_t size)
 	return (202);
 }
 
-static ssize_t		header_malloc(uint8_t *buff, uint8_t **header, uint8_t **end, ssize_t size)
+/*
+ * Copy the buffer into a malloced pointer.
+ * 
+ * If successful, return 1. Otherwise, a 0 is returned to indicate an error.
+*/
+static int			header_malloc(uint8_t *buff, uint8_t **header, uint8_t **end, ssize_t size)
 {
 	if ((*header = (uint8_t *)malloc(sizeof(uint8_t) * size)) == NULL)
-		return (-1);
+		return (0);
 	memcpy(*header, buff, size);
 	*end = (uint8_t *)strstr((const char *)*header, "\r\n\r\n");
 	bzero(*end, sizeof(uint8_t) * 4);
 	*end = *end + 4;	
-	return (size);
+	return (1);
 }
 
+/*
+ * Receive the header from the client.
+ * 
+ * If successful, the number of bytes actually read is returned.
+ * Upon reading end-of-file, zero is returned. Otherwise, a -1 is returned to indicate an error.
+*/
 static ssize_t		receive_header(int fd, uint8_t **header, uint8_t **end, int *status)
 {
 	ssize_t		size;
@@ -74,7 +92,7 @@ static ssize_t		receive_header(int fd, uint8_t **header, uint8_t **end, int *sta
 		*status = 408;
 		return (-1);
 	}
-	if ((size = header_malloc(buff, header, end, size)) == -1)
+	if (header_malloc(buff, header, end, size) == 0)
 	{
 		// Send Response: "500 Internal Server Error"
 		printf("ERROR: '500 Internal Server Error'\n");
@@ -84,6 +102,11 @@ static ssize_t		receive_header(int fd, uint8_t **header, uint8_t **end, int *sta
 	return (size);
 }
 
+/*
+ * Build the http header and send the appropriate response to the client.
+ * 
+ * If successful, return 1. Otherwise, a 0 is returned to indicate an error.
+*/
 int					receive(int fd, int *status)
 {
 	ssize_t		size;

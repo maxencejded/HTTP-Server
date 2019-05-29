@@ -18,7 +18,7 @@ typedef struct		s_method
 	uint8_t			number;
 }					t_method;
 
-void				http_free(t_http *data);
+int					http_free(t_http *data);
 
 char				**splitheader(char *str);
 
