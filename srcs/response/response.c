@@ -103,10 +103,11 @@ static int			write_connection_error(t_reponse *answer)
 		dprintf(answer->fd, "HTTP/%s ", protocol_version(answer->protocol));
 	if (answer->reponse)
 		dprintf(answer->fd, "%d %s\r\n", answer->reponse, get_reponse_message(answer->reponse));
+	dprintf(answer->fd, "Connexion: close\r\n");
 	if (answer->date)
 		dprintf(answer->fd, "Date: %s\r\n", answer->date);
 	if (answer->date)
-		dprintf(answer->fd, "Last Modified: %s\r\n", answer->date);
+		dprintf(answer->fd, "Last-Modified: %s\r\n", answer->date);
 	if (answer->content_type)
 		dprintf(answer->fd, "Content-Type: %s\r\n", answer->content_type);
 	if (answer->file_size)
@@ -166,10 +167,11 @@ static void			write_connection_success(t_reponse *answer)
 		dprintf(answer->fd, "HTTP/%s ", protocol_version(answer->protocol));
 	if (answer->reponse)
 		dprintf(answer->fd, "%d %s\r\n", answer->reponse, get_reponse_message(answer->reponse));
+	dprintf(answer->fd, "Connexion: close\r\n");
 	if (answer->date)
 		dprintf(answer->fd, "Date: %s\r\n", answer->date);
 	if (answer->date)
-		dprintf(answer->fd, "Last Modified: %s\r\n", answer->date);
+		dprintf(answer->fd, "Last-Modified: %s\r\n", answer->date);
 	if (answer->content_type)
 		dprintf(answer->fd, "Content-Type: %s\r\n", answer->content_type);
 	if (answer->file_size)
