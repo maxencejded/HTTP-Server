@@ -3,23 +3,22 @@
 int				connection_add(int fd, char *address, uint16_t connect)
 {
 	int			response;
-	// pid_t		pid;
+	pid_t		pid;
 
 	response = 200;
-	// if ((pid = fork()) == 0)
-	// {
+	if ((pid = fork()) == 0)
+	{
 		printf("[%d] At Address: %s\n", connect, address);
 		receive(fd, &response);
 		printf("[%d] Close with status: %d\n", connect, response);
-		close(fd);
-		// _exit(close(fd));
-	// }
-	// else if (pid < 0)
-	// {
-	// 	perror("ERROR: Fork");
-	// 	strdel(&address);
-	// 	return (0);
-	// }
+		_exit(close(fd));
+	}
+	else if (pid < 0)
+	{
+		perror("ERROR: Fork");
+		strdel(&address);
+		return (0);
+	}
 	strdel(&address);
 	return (1);
 }
@@ -69,6 +68,7 @@ int			main(int argc, char **argv)
 	printf("Starting new Server\nAdrress: %s:%d\n", address, PORT);
 	strdel(&address);
 	signal(SIGINT, sigstop);
+	signal(SIGPIPE, sigpipe);
 	if (loop(sock_fd) == 0)
 		exit_server();
 	close(sock_fd);

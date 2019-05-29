@@ -1,6 +1,7 @@
 #ifndef HTTP_H
 # define HTTP_H
 
+# include <errno.h>
 # include <netdb.h>
 # include <stdio.h>
 # include <stdlib.h>
@@ -43,6 +44,7 @@ int					socket_accept(int fd, char **address);
 int					receive(int fd, int *status);
 
 void				exit_server(void);
+void				sigpipe(int sig);
 void				sigstop(int sig);
 void				sigchld(int sig);
 
