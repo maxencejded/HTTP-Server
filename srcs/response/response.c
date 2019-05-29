@@ -46,34 +46,69 @@ static t_reponse	*reponse_init(void)
 }
 
 /*
- * Handling bad responses closing the connection
- * Return the error status implemented
-*/
-
-static int			end_connection_error(t_http *request, int reponse, int fd)
-{
-	size_t			content_length;
-	char			*message;
-
-	content_length = snprintf(NULL, 0, "HTTP/%s %d OK\nContent-Type: text/plain\nConnection: close\nContent-Length: %lu\n\nError People!", protocol_version(request), reponse, strlen("Error People!"));
-	if ((message = malloc(sizeof(char) * (content_length + 1))) == NULL)
-		return (end_connection_error(request, INTERNAL_SERVER_ERR, fd));
-	bzero(message, sizeof(char) * (content_length + 1));
-	sprintf(message, "HTTP/%s %d OK\nContent-Type: text/plain\nConnection: close\nContent-Length: %lu\n\nError People!", protocol_version(request), reponse, strlen("Error People!"));
-	write(fd, message, content_length);
-	strdel(&message);
-	return (reponse);
-}
-
-/*
  * Allowing me to free a char* while returning an int
  * Mostly used in error handling to free the complete path
 */
 
 static int		ft_free(void *path)
 {
-	free(path);
+	if (path)
+		free(path);
 	return (0);
+}
+
+/*
+ * Function to write the content of the error page linked to the error in 
+ * case of unsuccesful connection
+*/
+
+static int			write_connection_error(char *protocol, int reponse, char *date, char *content_type, uint64_t file_size, int file_fd, int fd)
+{
+	int		size;
+	char	buff[4096];
+
+	dprintf(fd, "HTTP/%s %d Error\r\nDate: %s\r\nServer: Mine\r\nLast Modified: %s\r\nContent-Type: %s\r\nConnection: close\r\nContent-Length: %lld\r\n\r\n", protocol, reponse, date, date, content_type, file_size - 1);
+	while ((size = read(file_fd, buff, 4096)) > 0)
+		write(fd, buff, size);
+	return (reponse);
+}
+
+/*
+ * Handling bad responses closing the connection
+ * Return the error status implemented
+*/
+
+static int			end_connection_error(t_http *request, int reponse, int fd)
+{
+	char			*complete_path;
+	int				file_fd;
+	uint64_t		file_size;
+	uint8_t			*content;
+	char			*content_type;
+	char			*date;
+	char			str[12];
+	
+	sprintf(str, "%d", reponse);
+	if ((complete_path = concat(ERROR_FOLDER_PATH, str)) == NULL)
+		return (write_connection_error(protocol_version(request), INTERNAL_SERVER_ERR, NULL, NULL, 0, -1, fd));
+	if ((complete_path = concat(complete_path, ".html")) == NULL)
+		return (write_connection_error(protocol_version(request), INTERNAL_SERVER_ERR, NULL, NULL, 0, -1, fd));
+	if ((file_fd = open(complete_path, O_RDONLY)) < 0 && ft_free(complete_path) == 0)
+		return (write_connection_error(protocol_version(request), NOT_FOUND, NULL, NULL, 0, -1, fd));
+	if ((content = get_file_content(&file_size, complete_path)) == NULL && ft_free(complete_path) == 0)
+		return (write_connection_error(protocol_version(request), NOT_FOUND, NULL, NULL, 0, -1, fd));
+	if (check_content_type(request, complete_path) != 0 && ft_free(complete_path) == 0 && ft_free(content) == 0)
+		return (write_connection_error(protocol_version(request), NOT_FOUND, NULL, NULL, 0, -1, fd));
+	if ((content_type = get_content_type(request, complete_path)) == NULL && ft_free(complete_path) == 0 && ft_free(content) == 0)
+		return (write_connection_error(protocol_version(request), NOT_FOUND, NULL, NULL, 0, -1, fd));
+	if ((date = get_date()) == NULL && ft_free(complete_path) == 0 && ft_free(content) == 0 && ft_free(content_type) == 0)
+		return (write_connection_error(protocol_version(request), NOT_FOUND, NULL, NULL, 0, -1, fd));
+	write_connection_error(protocol_version(request), reponse, date, content_type, file_size, file_fd, fd);
+	free(complete_path);
+	free(content);
+	free(content_type);
+	free(date);
+	return (reponse);
 }
 
 /*
@@ -84,7 +119,7 @@ static int		ft_free(void *path)
 static void			write_connection_success(char *protocol, int reponse, char *date, char *content_type, uint64_t file_size, int file_fd, int fd)
 {
 	int		size;
-	char	*buff[4096];
+	char	buff[4096];
 
 	dprintf(fd, "HTTP/%s %d OK\r\nDate: %s\r\nServer: Mine\r\nLast Modified: %s\r\nContent-Type: %s\r\nConnection: close\r\nContent-Length: %lld\r\n\r\n", protocol, reponse, date, date, content_type, file_size - 1);
 	while ((size = read(file_fd, buff, 4096)) > 0)
@@ -124,7 +159,6 @@ static int			end_connection_success(t_http *request, int reponse, int fd)
 		return (end_connection_error(request, BAD_REQUEST, fd));
 	if ((date = get_date()) == NULL && ft_free(complete_path) == 0 && ft_free(content) == 0 && ft_free(content_type) == 0)
 		return (end_connection_error(request, INTERNAL_SERVER_ERR, fd));
-//	printf("HTTP/%s %d OK\nContent-Type: %s\n", protocol_version(request), reponse, content_type);
 	write_connection_success(protocol_version(request), reponse, date, content_type, file_size, file_fd, fd);
 	free(complete_path);
 	free(content);

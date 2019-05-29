@@ -27,6 +27,7 @@ typedef struct		s_response
 */
 
 # define WEBSITE_FOLDER_PATH "site"
+# define ERROR_FOLDER_PATH "error_pages"
 
 /*
  * SUCCESS

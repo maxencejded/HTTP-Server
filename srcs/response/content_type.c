@@ -113,7 +113,6 @@ char			*get_content_type(t_http *request, char *complete_path)
 	if ((file_extension = strdup(&complete_path[n])) == NULL)
 		return (NULL);
 	i = -1;
-//	printf("My file extension: [%s] vs [%s]\n", file_extension, request->accept);
 	while (strncmp(file_extension, &request->accept[++i], strlen(file_extension)) != 0)
 		if (request->accept[i] == '*')
 			break ;
