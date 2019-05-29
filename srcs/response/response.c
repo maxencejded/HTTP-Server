@@ -33,7 +33,7 @@ static char			*get_date()
 }
 
 /*
- * Freeing response structure, not implemented yet
+ * Freeing response structure
 */
 
 static int			reponse_free(t_reponse *answer)
@@ -49,6 +49,13 @@ static int			reponse_free(t_reponse *answer)
 	if (answer->date)
 		free(answer->date);
 	free(answer);
+	return (0);
+}
+
+static int			ft_free(char *to_free)
+{
+	if (to_free)
+		free(to_free);
 	return (0);
 }
 
@@ -180,13 +187,11 @@ static int			end_connection_success(t_http *request, int reponse, int fd, t_repo
 	answer->reponse = reponse;
 	answer->protocol = strdup(protocol_version(request));
 	answer->fd = fd;
-	if ((strcmp(request->path, "/") == 0) && ((answer->complete_path = concat(WEBSITE_FOLDER_PATH, "/index.html")) == NULL))
+	ft_free(answer->complete_path);
+	if ((answer->complete_path = concat(WEBSITE_FOLDER_PATH, request->path)) == NULL)
 		return (end_connection_error(request, INTERNAL_SERVER_ERR, fd, answer));
-	else if ((answer->complete_path = concat(WEBSITE_FOLDER_PATH, request->path)) == NULL)
-		return (end_connection_error(request, INTERNAL_SERVER_ERR, fd, answer));
-
-	if (strcmp(request->path, "/") == 0)
-		if ((answer->complete_path = concat(WEBSITE_FOLDER_PATH, "/index.html")) == NULL)
+	if (!request->path || request->path[0] == '\0' || strcmp(request->path, "/") == 0)
+		if (ft_free(answer->complete_path) == 0 && (answer->complete_path = concat(WEBSITE_FOLDER_PATH, "/index.html")) == NULL)
 			return (end_connection_error(request, INTERNAL_SERVER_ERR, fd, answer));
 	if ((answer->file_fd = open(answer->complete_path, O_RDONLY)) < 0)
 		return (end_connection_error(request, INTERNAL_SERVER_ERR, fd, answer));
@@ -235,6 +240,7 @@ int		response(t_http *request, int fd)
 {
 	struct stat		sb;
 	t_reponse		*answer;
+	char			*concatted;
 
 	if (!request)
 		return (end_connection_error(request, BAD_REQUEST, fd, NULL));
@@ -243,7 +249,9 @@ int		response(t_http *request, int fd)
 	answer->fd = fd;
 	if ((request->method < 0 || request->method > 4))
 		return (end_connection_error(request, NOT_IMPLEMENTED, fd, answer));
-	if ((!request->path || stat(concat(WEBSITE_FOLDER_PATH, request->path), &sb) == -1))
+	concatted = concat(WEBSITE_FOLDER_PATH, request->path);
+	if ((!request->path || stat(concatted, &sb) == -1) && ft_free(concatted) == 0)
 		return (end_connection_error(request, NOT_FOUND, fd, answer));
+	ft_free(concatted);
 	return (end_connection_success(request, OK, fd, answer));
 }
