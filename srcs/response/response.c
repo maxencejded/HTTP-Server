@@ -42,8 +42,6 @@ static int			reponse_free(t_reponse *answer)
 		return (0);
 	if (answer->complete_path)
 		free(answer->complete_path);
-	if (answer->protocol)
-		free(answer->protocol);
 	if (answer->content_type)
 		free(answer->content_type);
 	if (answer->date)
@@ -70,6 +68,7 @@ static t_reponse	*reponse_init(void)
 	if ((answer = (t_reponse *)malloc(sizeof(t_reponse))) == NULL)
 		return (NULL);
 	bzero(answer, sizeof(t_reponse));
+	answer->file_fd = -1;
 	return (answer);
 }
 
@@ -101,7 +100,7 @@ static int			write_connection_error(t_reponse *answer)
 	char	buff[PAGE_SIZE];
 
 	if (answer->protocol)
-		dprintf(answer->fd, "HTTP/%s ", answer->protocol);
+		dprintf(answer->fd, "HTTP/%s ", protocol_version(answer->protocol));
 	if (answer->reponse)
 		dprintf(answer->fd, "%d %s\r\n", answer->reponse, get_reponse_message(answer->reponse));
 	if (answer->date)
@@ -112,8 +111,11 @@ static int			write_connection_error(t_reponse *answer)
 		dprintf(answer->fd, "Content-Type: %s\r\n", answer->content_type);
 	if (answer->file_size)
 		dprintf(answer->fd, "Content-Length: %lld\r\n\r\n", answer->file_size);
-	while ((size = read(answer->file_fd, buff, PAGE_SIZE)) > 0)
-		write(answer->fd, buff, size);
+	if (answer->file_fd != -1)
+	{
+		while ((size = read(answer->file_fd, buff, PAGE_SIZE)) > 0)
+			write(answer->fd, buff, size);
+	}
 	reponse = answer->reponse;
 	reponse_free(answer);
 	return (reponse);
@@ -129,7 +131,7 @@ static int			end_connection_error(t_http *request, int reponse, int fd, t_repons
 	char			str[4];
 
 	answer->reponse = reponse;
-	answer->protocol = strdup(protocol_version(request));
+	answer->protocol = (request == NULL) ? 1 : request->protocol;
 	answer->fd = fd;
 	sprintf(str, "%d", reponse);
 	if ((answer->complete_path = concat(ERROR_FOLDER_PATH, str)) == NULL && http_free(request) == 1)
@@ -161,7 +163,7 @@ static void			write_connection_success(t_reponse *answer)
 	char	buff[PAGE_SIZE];
 
 	if (answer->protocol)
-		dprintf(answer->fd, "HTTP/%s ", answer->protocol);
+		dprintf(answer->fd, "HTTP/%s ", protocol_version(answer->protocol));
 	if (answer->reponse)
 		dprintf(answer->fd, "%d %s\r\n", answer->reponse, get_reponse_message(answer->reponse));
 	if (answer->date)
@@ -185,7 +187,7 @@ static void			write_connection_success(t_reponse *answer)
 static int			end_connection_success(t_http *request, int reponse, int fd, t_reponse *answer)
 {
 	answer->reponse = reponse;
-	answer->protocol = strdup(protocol_version(request));
+	answer->protocol = (request == NULL) ? 1 : request->protocol;
 	answer->fd = fd;
 	ft_free(answer->complete_path);
 	if ((answer->complete_path = concat(WEBSITE_FOLDER_PATH, request->path)) == NULL)
@@ -217,7 +219,7 @@ int				create_partial_answer(int fd, t_http *request, int reponse)
 {
 	t_reponse	*answer;
 
-	if ((answer = reponse_init()) == NULL || !request)
+	if (reponse == INTERNAL_SERVER_ERR || (answer = reponse_init()) == NULL)
 	{
 		dprintf(fd, "HTTP/1.0 500 Internal Server Error\r\n\r\n");
 		close (fd);
@@ -225,7 +227,7 @@ int				create_partial_answer(int fd, t_http *request, int reponse)
 	}
 	answer->fd = fd;
 	answer->reponse = reponse;
-	answer->protocol = strdup(protocol_version(request));
+	answer->protocol = (request == NULL) ? 1 : request->protocol;
 	answer->date = get_date();
 	http_free(request);
 	return (write_connection_error(answer));

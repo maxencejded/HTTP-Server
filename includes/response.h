@@ -17,7 +17,7 @@ typedef struct		s_response
 {
 	char			*complete_path;
 	int				reponse;
-	char			*protocol;
+	uint8_t			protocol;
 	int				fd;
 	int				file_fd;
 	uint64_t		file_size;
@@ -78,7 +78,7 @@ typedef struct		s_response
 */
 
 int		response(t_http *request, int fd);
-char	*protocol_version(t_http *request);
+char	*protocol_version(uint8_t protocol);
 int		check_content_type(t_http *request, char *complete_path);
 char	*get_content_type(t_http *request, char *complete_path);
 int		create_partial_answer(int fd, t_http *data, int reponse);

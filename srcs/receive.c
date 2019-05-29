@@ -64,23 +64,16 @@ static ssize_t		receive_header(int fd, uint8_t **header, uint8_t **end, int *sta
 		{
 			*status = create_partial_answer(fd, NULL, ENTITY_TOO_LARGE);
 			return (-1);
-		}	
+		}
 	}
 	else if (size == 0)
-	{
 		*status = create_partial_answer(fd, NULL, NO_CONTENT);
-		return (0);
-	}
 	else
-	{
 		*status = create_partial_answer(fd, NULL, REQUEST_TIME_OUT);
-		return (-1);
-	}
 	if (header_malloc(buff, header, end, size) == 0)
-	{
 		*status = create_partial_answer(fd, NULL, INTERNAL_SERVER_ERR);
-		return (-1);
-	}
+	if (*status != 200)
+		return ((size == 0) ? 0 : -1);
 	return (size);
 }
 
