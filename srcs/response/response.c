@@ -32,6 +32,26 @@ static char			*get_date()
 }
 
 /*
+ * Freeing response structure, not implemented yet
+*/
+
+static int			reponse_free(t_reponse *answer)
+{
+	if (answer == NULL)
+		return (0);
+	if (answer->complete_path)
+		free(answer->complete_path);
+	if (answer->protocol)
+		free(answer->protocol);
+	if (answer->content_type)
+		free(answer->content_type);
+	if (answer->date)
+		free(answer->date);
+	free(answer);
+	return (0);
+}
+
+/*
  * Initializing response structure not in use right now
 */
 
@@ -62,14 +82,17 @@ static int		ft_free(void *path)
  * case of unsuccesful connection
 */
 
-static int			write_connection_error(char *protocol, int reponse, char *date, char *content_type, uint64_t file_size, int file_fd, int fd)
+static int			write_connection_error(t_reponse *answer)
 {
 	int		size;
+	int		reponse;
 	char	buff[4096];
 
-	dprintf(fd, "HTTP/%s %d Error\r\nDate: %s\r\nServer: Mine\r\nLast Modified: %s\r\nContent-Type: %s\r\nConnection: close\r\nContent-Length: %lld\r\n\r\n", protocol, reponse, date, date, content_type, file_size - 1);
-	while ((size = read(file_fd, buff, 4096)) > 0)
-		write(fd, buff, size);
+	dprintf(answer->fd, "HTTP/%s %d Error\r\nDate: %s\r\nServer: Mine\r\nLast Modified: %s\r\nContent-Type: %s\r\nConnection: close\r\nContent-Length: %lld\r\n\r\n", answer->protocol, answer->reponse, answer->date, answer->date, answer->content_type, answer->file_size);
+	while ((size = read(answer->file_fd, buff, 4096)) > 0)
+		write(answer->fd, buff, size);
+	reponse = answer->reponse;
+	reponse_free(answer);
 	return (reponse);
 }
 
@@ -78,36 +101,30 @@ static int			write_connection_error(char *protocol, int reponse, char *date, cha
  * Return the error status implemented
 */
 
-static int			end_connection_error(t_http *request, int reponse, int fd)
+static int			end_connection_error(t_http *request, int reponse, int fd, t_reponse *answer)
 {
-	char			*complete_path;
-	int				file_fd;
-	uint64_t		file_size;
-	uint8_t			*content;
-	char			*content_type;
-	char			*date;
-	char			str[12];
-	
+	char			str[4];
+
+	answer->reponse = reponse;
+	answer->protocol = strdup(protocol_version(request));
+	answer->fd = fd;
 	sprintf(str, "%d", reponse);
-	if ((complete_path = concat(ERROR_FOLDER_PATH, str)) == NULL)
-		return (write_connection_error(protocol_version(request), INTERNAL_SERVER_ERR, NULL, NULL, 0, -1, fd));
-	if ((complete_path = concat(complete_path, ".html")) == NULL)
-		return (write_connection_error(protocol_version(request), INTERNAL_SERVER_ERR, NULL, NULL, 0, -1, fd));
-	if ((file_fd = open(complete_path, O_RDONLY)) < 0 && ft_free(complete_path) == 0)
-		return (write_connection_error(protocol_version(request), NOT_FOUND, NULL, NULL, 0, -1, fd));
-	if ((content = get_file_content(&file_size, complete_path)) == NULL && ft_free(complete_path) == 0)
-		return (write_connection_error(protocol_version(request), NOT_FOUND, NULL, NULL, 0, -1, fd));
-	if (check_content_type(request, complete_path) != 0 && ft_free(complete_path) == 0 && ft_free(content) == 0)
-		return (write_connection_error(protocol_version(request), NOT_FOUND, NULL, NULL, 0, -1, fd));
-	if ((content_type = get_content_type(request, complete_path)) == NULL && ft_free(complete_path) == 0 && ft_free(content) == 0)
-		return (write_connection_error(protocol_version(request), NOT_FOUND, NULL, NULL, 0, -1, fd));
-	if ((date = get_date()) == NULL && ft_free(complete_path) == 0 && ft_free(content) == 0 && ft_free(content_type) == 0)
-		return (write_connection_error(protocol_version(request), NOT_FOUND, NULL, NULL, 0, -1, fd));
-	write_connection_error(protocol_version(request), reponse, date, content_type, file_size, file_fd, fd);
-	free(complete_path);
-	free(content);
-	free(content_type);
-	free(date);
+	if ((answer->complete_path = concat(ERROR_FOLDER_PATH, str)) == NULL)
+		return (write_connection_error(answer));
+	if ((answer->complete_path = concat(answer->complete_path, ".html")) == NULL)
+		return (write_connection_error(answer));
+	if ((answer->file_fd = open(answer->complete_path, O_RDONLY)) < 0)
+		return (write_connection_error(answer));
+	if ((get_file_content(&answer->file_size, answer->complete_path)) < 0)
+		return (write_connection_error(answer));
+	if (check_content_type(request, answer->complete_path) != 0)
+		return (write_connection_error(answer));
+	if ((answer->content_type = get_content_type(request, answer->complete_path)) == NULL)
+		return (write_connection_error(answer));
+	if ((answer->date = get_date()) == NULL)
+		return (write_connection_error(answer));
+	write_connection_error(answer);
+	reponse_free(answer);
 	return (reponse);
 }
 
@@ -116,14 +133,14 @@ static int			end_connection_error(t_http *request, int reponse, int fd)
  * succesful connection
 */
 
-static void			write_connection_success(char *protocol, int reponse, char *date, char *content_type, uint64_t file_size, int file_fd, int fd)
+static void			write_connection_success(t_reponse *answer)
 {
 	int		size;
 	char	buff[4096];
 
-	dprintf(fd, "HTTP/%s %d OK\r\nDate: %s\r\nServer: Mine\r\nLast Modified: %s\r\nContent-Type: %s\r\nConnection: close\r\nContent-Length: %lld\r\n\r\n", protocol, reponse, date, date, content_type, file_size - 1);
-	while ((size = read(file_fd, buff, 4096)) > 0)
-		write(fd, buff, size);
+	dprintf(answer->fd, "HTTP/%s %d OK\r\nDate: %s\r\nServer: Mine\r\nLast Modified: %s\r\nContent-Type: %s\r\nConnection: close\r\nContent-Length: %lld\r\n\r\n", answer->protocol, answer->reponse, answer->date, answer->date, answer->content_type, answer->file_size - 1);
+	while ((size = read(answer->file_fd, buff, 4096)) > 0)
+		write(answer->fd, buff, size);
 }
 
 /*
@@ -132,54 +149,32 @@ static void			write_connection_success(char *protocol, int reponse, char *date, 
  * function.
 */
 
-static int			end_connection_success(t_http *request, int reponse, int fd)
+static int			end_connection_success(t_http *request, int reponse, int fd, t_reponse *answer)
 {
-	char		*complete_path;
-	int			file_fd;
-	uint64_t	file_size;
-	uint8_t		*content;
-	char		*content_type;
-	char		*date;
-
-	if ((strcmp(request->path, "/") == 0) && ((complete_path = concat(WEBSITE_FOLDER_PATH, "/index.html")) == NULL))
-		return (end_connection_error(request, INTERNAL_SERVER_ERR, fd));
-	else if ((complete_path = concat(WEBSITE_FOLDER_PATH, request->path)) == NULL)
-		return (end_connection_error(request, INTERNAL_SERVER_ERR, fd));
+	answer->reponse = reponse;
+	answer->protocol = strdup(protocol_version(request));
+	answer->fd = fd;
+	if ((strcmp(request->path, "/") == 0) && ((answer->complete_path = concat(WEBSITE_FOLDER_PATH, "/index.html")) == NULL))
+		return (end_connection_error(request, INTERNAL_SERVER_ERR, fd, answer));
+	else if ((answer->complete_path = concat(WEBSITE_FOLDER_PATH, request->path)) == NULL)
+		return (end_connection_error(request, INTERNAL_SERVER_ERR, fd, answer));
 
 	if (strcmp(request->path, "/") == 0)
-		if ((complete_path = concat(WEBSITE_FOLDER_PATH, "/index.html")) == NULL)
-			return (end_connection_error(request, INTERNAL_SERVER_ERR, fd));
-	if ((file_fd = open(complete_path, O_RDONLY)) < 0 && ft_free(complete_path) == 0)
-		return (end_connection_error(request, INTERNAL_SERVER_ERR, fd));
-	if ((content = get_file_content(&file_size, complete_path)) == NULL && ft_free(complete_path) == 0)
-		return (end_connection_error(request, SERVICE_UNAVAILABLE, fd));
-	if (check_content_type(request, complete_path) != 0 && ft_free(complete_path) == 0 && ft_free(content) == 0)
-		return (end_connection_error(request, BAD_REQUEST, fd));
-	if ((content_type = get_content_type(request, complete_path)) == NULL && ft_free(complete_path) == 0 && ft_free(content) == 0)
-		return (end_connection_error(request, BAD_REQUEST, fd));
-	if ((date = get_date()) == NULL && ft_free(complete_path) == 0 && ft_free(content) == 0 && ft_free(content_type) == 0)
-		return (end_connection_error(request, INTERNAL_SERVER_ERR, fd));
-	write_connection_success(protocol_version(request), reponse, date, content_type, file_size, file_fd, fd);
-	free(complete_path);
-	free(content);
-	free(content_type);
-	free(date);
+		if ((answer->complete_path = concat(WEBSITE_FOLDER_PATH, "/index.html")) == NULL)
+			return (end_connection_error(request, INTERNAL_SERVER_ERR, fd, answer));
+	if ((answer->file_fd = open(answer->complete_path, O_RDONLY)) < 0)
+		return (end_connection_error(request, INTERNAL_SERVER_ERR, fd, answer));
+	if ((get_file_content(&answer->file_size, answer->complete_path)) < 0)
+		return (end_connection_error(request, SERVICE_UNAVAILABLE, fd, answer));
+	if (check_content_type(request, answer->complete_path) != 0)
+		return (end_connection_error(request, BAD_REQUEST, fd, answer));
+	if ((answer->content_type = get_content_type(request, answer->complete_path)) == NULL)
+		return (end_connection_error(request, BAD_REQUEST, fd, answer));
+	if ((answer->date = get_date()) == NULL)
+		return (end_connection_error(request, INTERNAL_SERVER_ERR, fd, answer));
+	write_connection_success(answer);
+	reponse_free(answer);
 	return (reponse);
-}
-
-/*
- * Freeing response structure, not implemented yet
-*/
-
-static void			reponse_free(t_reponse *answer)
-{
-	if (answer == NULL)
-		return ;
-	if (answer && answer->content)
-		free(answer->content);
-	if (answer)
-		free(answer);
-	return ;
 }
 
 /*
@@ -192,14 +187,16 @@ int		response(t_http *request, int fd)
 	struct stat		sb;
 	t_reponse		*answer;
 
-	(void)reponse_free;
+	(void)ft_free;
 	if (!request)
-		return (end_connection_error(request, BAD_REQUEST, fd));
+		return (end_connection_error(request, BAD_REQUEST, fd, NULL));
 	if ((answer = reponse_init()) == NULL)
-		return (end_connection_error(request, INTERNAL_SERVER_ERR, fd));
-	if (request->method < 0 || request->method > 4)
-		return (end_connection_error(request, NOT_IMPLEMENTED, fd));
-	if (!request->path || stat(concat(WEBSITE_FOLDER_PATH, request->path), &sb) == -1)
-		return (end_connection_error(request, NOT_FOUND, fd));
-	return (end_connection_success(request, OK, fd));
+		return (end_connection_error(request, INTERNAL_SERVER_ERR, fd, NULL));
+	answer->fd = fd;
+	if ((request->method < 0 || request->method > 4) && reponse_free(answer) == 0)
+		return (end_connection_error(request, NOT_IMPLEMENTED, fd, NULL));
+	if ((!request->path || stat(concat(WEBSITE_FOLDER_PATH, request->path), &sb) == -1)
+			&& reponse_free(answer) == 0)
+		return (end_connection_error(request, NOT_FOUND, fd, NULL));
+	return (end_connection_success(request, OK, fd, answer));
 }

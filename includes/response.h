@@ -15,11 +15,14 @@
 
 typedef struct		s_response
 {
-	uint8_t			code;
-	uint8_t			protocol;
-	uint32_t		header_size;
-	uint32_t		content_length;
-	uint8_t			*content;
+	char			*complete_path;
+	int				reponse;
+	char			*protocol;
+	int				fd;
+	int				file_fd;
+	uint64_t		file_size;
+	char			*content_type;
+	char			*date;
 }					t_reponse;
 
 /*
@@ -27,7 +30,7 @@ typedef struct		s_response
 */
 
 # define WEBSITE_FOLDER_PATH "site"
-# define ERROR_FOLDER_PATH "error_pages"
+# define ERROR_FOLDER_PATH "error_pages/"
 
 /*
  * SUCCESS
