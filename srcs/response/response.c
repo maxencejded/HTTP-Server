@@ -46,6 +46,7 @@ static int			reponse_free(t_reponse *answer)
 		free(answer->content_type);
 	if (answer->date)
 		free(answer->date);
+	close(answer->file_fd);
 	free(answer);
 	return (0);
 }
