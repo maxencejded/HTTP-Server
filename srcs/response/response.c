@@ -21,13 +21,14 @@ static char			*get_date()
 {
 	char			*date;
 	time_t			t;
-	struct tm tm = *localtime(&t);
-
-	t = time(NULL);
+	struct tm		*tm;
+	
+	time(&t);
+	tm = localtime(&t);
 	if ((date = malloc(sizeof(char) * 30)) == NULL)
 		return (NULL);
-	bzero(date, sizeof(31));
-	sprintf(date, "%d-%d-%d %d:%d:%d", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
+	bzero(date, sizeof(char) * 30);
+	sprintf(date, "%d-%d-%d %d:%d:%d", tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday, tm->tm_hour, tm->tm_min, tm->tm_sec);
 	return (date);
 }
 

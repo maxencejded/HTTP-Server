@@ -2,9 +2,9 @@
 
 /*
  * Read the content send through the header.
- * 
  * If successful, return OK. Otherwise, an appropriate code error is returned.
 */
+
 static int			receive_content(int fd, t_http *data, uint8_t *str, ssize_t size)
 {
 	uint8_t		buff[BUFF_SOCKET];
@@ -13,12 +13,7 @@ static int			receive_content(int fd, t_http *data, uint8_t *str, ssize_t size)
 
 	total = size;
 	if ((data->content = (uint8_t *)malloc(sizeof(uint8_t) * data->content_length)) == NULL)
-	{
-		// Send Response: "500 Internal Server Error"
-		printf("ERROR: '500 Internal Server Error'\n");
-		create_partial_answer(fd, data, INTERNAL_SERVER_ERR);
-		return (500);
-	}
+		return (create_partial_answer(fd, data, INTERNAL_SERVER_ERR));
 	bzero(data->content, sizeof(uint8_t) * data->content_length);
 	memcpy(data->content, str, size);
 	content = data->content + size;
@@ -31,20 +26,15 @@ static int			receive_content(int fd, t_http *data, uint8_t *str, ssize_t size)
 		content = content + size;
 	}
 	if (total != data->content_length)
-	{
-		// Send Response: "400 Bad Request"
-		printf("ERROR: '400 Bad Request'\n");
-		create_partial_answer(fd, data, BAD_REQUEST);
-		return (400);
-	}
+		return (create_partial_answer(fd, data, BAD_REQUEST));
 	return (202);
 }
 
 /*
- * Copy the buffer into a malloced pointer.
- * 
+ * Copy the buffer into a malloced pointer. 
  * If successful, return 1. Otherwise, a 0 is returned to indicate an error.
 */
+
 static int			header_malloc(uint8_t *buff, uint8_t **header, uint8_t **end, ssize_t size)
 {
 	if ((*header = (uint8_t *)malloc(sizeof(uint8_t) * size)) == NULL)
@@ -58,10 +48,10 @@ static int			header_malloc(uint8_t *buff, uint8_t **header, uint8_t **end, ssize
 
 /*
  * Receive the header from the client.
- * 
  * If successful, the number of bytes actually read is returned.
  * Upon reading end-of-file, zero is returned. Otherwise, a -1 is returned to indicate an error.
 */
+
 static ssize_t		receive_header(int fd, uint8_t **header, uint8_t **end, int *status)
 {
 	ssize_t		size;
@@ -72,30 +62,22 @@ static ssize_t		receive_header(int fd, uint8_t **header, uint8_t **end, int *sta
 	{
 		if (strstr((const char *)buff, "\r\n\r\n") == NULL)
 		{
-			// Send Response: "413 Entity Too Large"
-			printf("ERROR: '413 Entity Too Large'\n");
 			*status = create_partial_answer(fd, NULL, ENTITY_TOO_LARGE);
 			return (-1);
 		}	
 	}
 	else if (size == 0)
 	{
-		// Send Response: "204 No Content"
-		printf("ERROR: '204 No Content'\n");
 		*status = create_partial_answer(fd, NULL, NO_CONTENT);
 		return (0);
 	}
 	else
 	{
-		// Send Response: "408 Request Time-out"
-		perror("ERROR: '408 Request Time-out'");
 		*status = create_partial_answer(fd, NULL, REQUEST_TIME_OUT);
 		return (-1);
 	}
 	if (header_malloc(buff, header, end, size) == 0)
 	{
-		// Send Response: "500 Internal Server Error"
-		printf("ERROR: '500 Internal Server Error'\n");
 		*status = create_partial_answer(fd, NULL, INTERNAL_SERVER_ERR);
 		return (-1);
 	}
@@ -104,9 +86,9 @@ static ssize_t		receive_header(int fd, uint8_t **header, uint8_t **end, int *sta
 
 /*
  * Build the http header and send the appropriate response to the client.
- * 
  * If successful, return 1. Otherwise, a 0 is returned to indicate an error.
 */
+
 int					receive(int fd, int *status)
 {
 	ssize_t		size;

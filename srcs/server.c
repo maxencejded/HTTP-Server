@@ -32,11 +32,21 @@ int				loop(int fd)
 	connect = 0;
 	address = NULL;
 	signal(SIGCHLD, sigchld);
-	while ((sock_new = socket_accept(fd, &address)) > 0)
+	// while ((sock_new = socket_accept(fd, &address)) > 0)
+	// {
+	// 	if (connection_add(sock_new, address, connect) == 0)
+	// 		return (0);
+	// 	close(sock_new);
+	// 	++connect;
+	// }
+	while (connect < 10)
 	{
-		if (connection_add(sock_new, address, connect) == 0)
-			return (0);
-		close(sock_new);
+		if ((sock_new = socket_accept(fd, &address)) > 0)
+		{
+			if (connection_add(sock_new, address, connect) == 0)
+				return (0);
+			close(sock_new);
+		}
 		++connect;
 	}
 	if (sock_new == -1)
