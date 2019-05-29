@@ -118,6 +118,8 @@ char			*get_content_type(t_http *request, char *complete_path)
 		if (request->accept[i] == '*')
 			break ;
 	free(file_extension);
+	if (request->accept[i] == '*')
+		i = 0;
 	n = i;
 	while (n > 0 && request->accept[n] != ',' && request->accept[n] != ';')
 		--n;

@@ -2,18 +2,17 @@
 #include <fcntl.h>
 #include "http.h"
 
-char		*get_file_content(const int fd, int *file_size, char *filename)
+uint8_t		*get_file_content(uint64_t *file_size, char *filename)
 {
-	char		*buffer;
+	uint8_t		*content;
 	struct stat	st;
 
 	if (stat(filename, &st) != 0 && (*file_size = 0) == 0)
 		return (NULL);
 	*file_size = st.st_size;
-	if ((buffer = malloc(sizeof(char) * (*file_size + 1))) == NULL)
+	if ((content = malloc(sizeof(uint8_t) * 2)) == NULL)
 		return (NULL);
-	if (read(fd, buffer, *file_size) < 0)
-		return (NULL);
-	close(fd);
-	return (buffer);
+	content[0] = '1';
+	content[1] = '\0';
+	return (content);
 }

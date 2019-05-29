@@ -1,6 +1,7 @@
 #include "server.h"
 #include "response.h"
 
+#include <time.h>
 #include <fcntl.h>
 
 /*
@@ -15,6 +16,20 @@
  * Ip of the server of dev:
  * 127.0.0.1:6060
 */
+
+static char			*get_date()
+{
+	char			*date;
+	time_t			t;
+	struct tm tm = *localtime(&t);
+
+	t = time(NULL);
+	if ((date = malloc(sizeof(char) * 30)) == NULL)
+		return (NULL);
+	bzero(date, sizeof(31));
+	sprintf(date, "%d-%d-%d %d:%d:%d", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
+	return (date);
+}
 
 /*
  * Initializing response structure not in use right now
@@ -55,10 +70,25 @@ static int			end_connection_error(t_http *request, int reponse, int fd)
  * Mostly used in error handling to free the complete path
 */
 
-static int		ft_free(char *path)
+static int		ft_free(void *path)
 {
 	free(path);
 	return (0);
+}
+
+/*
+ * Function to write the content to the fd of the socket in case of 
+ * succesful connection
+*/
+
+static void			write_connection_success(char *protocol, int reponse, char *date, char *content_type, uint64_t file_size, int file_fd, int fd)
+{
+	int		size;
+	char	*buff[4096];
+
+	dprintf(fd, "HTTP/%s %d OK\r\nDate: %s\r\nServer: Mine\r\nLast Modified: %s\r\nContent-Type: %s\r\nConnection: close\r\nContent-Length: %lld\r\n\r\n", protocol, reponse, date, date, content_type, file_size - 1);
+	while ((size = read(file_fd, buff, 4096)) > 0)
+		write(fd, buff, size);
 }
 
 /*
@@ -69,11 +99,12 @@ static int		ft_free(char *path)
 
 static int			end_connection_success(t_http *request, int reponse, int fd)
 {
-	char	*complete_path;
-	int		file_fd;
-	int		file_size;
-	char	*content;
-	char	*content_type;
+	char		*complete_path;
+	int			file_fd;
+	uint64_t	file_size;
+	uint8_t		*content;
+	char		*content_type;
+	char		*date;
 
 	if ((strcmp(request->path, "/") == 0) && ((complete_path = concat(WEBSITE_FOLDER_PATH, "/index.html")) == NULL))
 		return (end_connection_error(request, INTERNAL_SERVER_ERR, fd));
@@ -85,16 +116,20 @@ static int			end_connection_success(t_http *request, int reponse, int fd)
 			return (end_connection_error(request, INTERNAL_SERVER_ERR, fd));
 	if ((file_fd = open(complete_path, O_RDONLY)) < 0 && ft_free(complete_path) == 0)
 		return (end_connection_error(request, INTERNAL_SERVER_ERR, fd));
-	if ((content = get_file_content(file_fd, &file_size, complete_path)) == NULL && ft_free(complete_path) == 0)
+	if ((content = get_file_content(&file_size, complete_path)) == NULL && ft_free(complete_path) == 0)
 		return (end_connection_error(request, SERVICE_UNAVAILABLE, fd));
-	if (check_content_type(request, complete_path) != 0 && ft_free(complete_path) == 0)
+	if (check_content_type(request, complete_path) != 0 && ft_free(complete_path) == 0 && ft_free(content) == 0)
 		return (end_connection_error(request, BAD_REQUEST, fd));
-	if ((content_type = get_content_type(request, complete_path)) == NULL)
+	if ((content_type = get_content_type(request, complete_path)) == NULL && ft_free(complete_path) == 0 && ft_free(content) == 0)
 		return (end_connection_error(request, BAD_REQUEST, fd));
-	printf("HTTP/%s %d OK\nContent-Type: %s\n", protocol_version(request), reponse, content_type);
-	dprintf(fd, "HTTP/%s %d OK\nContent-Type: %s\nConnection: close\nContent-Length: %d\n\n%s", protocol_version(request), reponse, content_type, file_size, content);
+	if ((date = get_date()) == NULL && ft_free(complete_path) == 0 && ft_free(content) == 0 && ft_free(content_type) == 0)
+		return (end_connection_error(request, INTERNAL_SERVER_ERR, fd));
+//	printf("HTTP/%s %d OK\nContent-Type: %s\n", protocol_version(request), reponse, content_type);
+	write_connection_success(protocol_version(request), reponse, date, content_type, file_size, file_fd, fd);
 	free(complete_path);
+	free(content);
 	free(content_type);
+	free(date);
 	return (reponse);
 }
 
