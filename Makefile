@@ -1,11 +1,11 @@
 CC				= gcc
 RM				= rm -f
 SERVER			= server
-CFLAGS			= -Wall -Wextra -Werror -g -fsanitize=address -fsanitize=undefined
+CFLAGS			= -Wall -Wextra -Werror -g
 INCLUDES		= -I includes
 
 BASE			= server.c socket.c receive.c signal.c
-REQUEST			= request.c method.c splitheader.c
+REQUEST			= request.c method.c
 FIELDS			= fields.c fields_first.c fields_second.c fields_sixth.c fields_fifth.c\
 					fields_fourth.c fields_seventh.c fields_third.c
 RESPONSE		= response.c protocol.c content_type.c
@@ -25,7 +25,7 @@ all: $(SERVER)
 	@$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
 $(SERVER): $(OBJECTS)
-	@$(CC) $(CFLAGS) $(INCLUDES) -o $(SERVER) $(OBJECTS) 
+	@$(CC) $(CFLAGS) $(INCLUDES) -o $(SERVER) $(OBJECTS)
 
 clean:
 	@$(RM) $(OBJECTS)

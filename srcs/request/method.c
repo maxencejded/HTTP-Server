@@ -36,7 +36,7 @@ static uint8_t		method_path(char *method, t_http *data)
 	return (1);
 }
 
-#define METHOD_NUMBER 9
+#define METHOD_NUMBER 4
 
 uint8_t				method(char *method, t_http *data)
 {
@@ -45,12 +45,7 @@ uint8_t				method(char *method, t_http *data)
 		{"GET", 3, METHOD_GET},
 		{"HEAD", 4, METHOD_HEAD},
 		{"POST", 4, METHOD_POST},
-		{"PUT", 3, METHOD_PUT},
-		{"DELETE", 6, 5},
-		{"CONNECT", 7, 6},
-		{"OPTIONS", 7, 7},
-		{"TRACE", 5, 8},
-		{"PATCH", 5, 9}
+		{"PUT", 3, METHOD_PUT}
 	};
 
 	i = 0;

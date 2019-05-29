@@ -1,6 +1,6 @@
 #include "server.h"
 
-static t_http	*http_init(void)
+static t_http		*http_init(void)
 {
 	t_http	*data;
 
@@ -10,7 +10,7 @@ static t_http	*http_init(void)
 	return (data);
 }
 
-void			http_free(t_http *data)
+void				http_free(t_http *data)
 {
 	if (data == NULL)
 		return ;
@@ -18,29 +18,59 @@ void			http_free(t_http *data)
 	free(data->accept);
 	free(data->content);
 	free(data);
-	data = NULL;
 }
 
-t_http			*header(char *request)
+static uint32_t		header_next(char *str)
 {
-	uint8_t		i;
-	char		**fields;
+	uint32_t		i;
+
+	i = 0;
+	while (str[i])
+	{
+		if (str[i] == '\r')
+		{
+			str[i] = '\0';
+			if (str[++i] == '\n')
+			{
+				str[i] = '\0';
+				++i;
+			}
+			return (i);
+		}
+		++i;
+	}
+	return (i);
+}
+
+t_http				*header(char *request, int *status)
+{
+	uint32_t		index;
 	t_http		*header;
 
 	if (request == NULL)
 		return (NULL);
 	if ((header = http_init()) == NULL)
-		return (NULL);
-	if ((fields = splitheader(request)) == NULL)
-		return (NULL);
-	if (fields[0] == NULL || method(fields[0], header) == 0)
 	{
-		http_free(header);
+		// Send Response: "500 Internal Server Error"
+		printf("ERROR: '500 Internal Server Error'\n");
+		*status = 500;
 		return (NULL);
 	}
-	i = 0;
-	while (fields[++i] != NULL)
-		fields_dispatch(fields[i], header);
-	ptrdel(fields);
+	index = header_next(request);
+	if (method(request, header) == 0)
+	{
+		// Send Response: "501 Not Implemented"
+		printf("ERROR: '501 Not Implemented'\n");
+		http_free(header);
+		*status = 501;
+		return (NULL);
+	}
+	request = request + index;
+	while (*request)
+	{
+		index = header_next(request);
+		fields_dispatch(request, header);
+		request = request + index;
+	}
 	return (header);
 }
