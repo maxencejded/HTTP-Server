@@ -45,6 +45,7 @@ int			socket_bind(int fd, int port, char **address)
 int			socket_accept(int fd, char **address)
 {
 	int					sock;
+	int					sigpipe;
 	socklen_t			sock_len;
 	struct timeval		timeout;      
 	struct sockaddr_in	sock_init;
@@ -62,6 +63,11 @@ int			socket_accept(int fd, char **address)
 	if (setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(struct timeval)) == -1)
 	{
 		perror("ERROR: Setsockopt(SO_RCVTIMEO)");
+		return (-1);
+	}
+	if (setsockopt(sock, SOL_SOCKET, SO_NOSIGPIPE, &sigpipe, sizeof(int)) == -1)
+	{
+		perror("ERROR: Setsockopt(SO_NOSIGPIPE)");
 		return (-1);
 	}
 	*address = strdup(inet_ntoa(sock_init.sin_addr));

@@ -6,14 +6,6 @@ void		exit_server(void)
 	exit(EXIT_FAILURE);
 }
 
-void		sigpipe(int sig)
-{
-	(void)sig;
-
-	printf("Connection to the Client closed\n");
-	_exit(EXIT_FAILURE);
-}
-
 void		sigstop(int sig)
 {
 	(void)sig;

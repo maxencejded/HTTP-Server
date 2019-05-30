@@ -1,15 +1,17 @@
 #ifndef HTTP_H
 # define HTTP_H
 
-# include <errno.h>
 # include <netdb.h>
+# include <signal.h>
 # include <stdio.h>
+# include <stdint.h>
 # include <stdlib.h>
 # include <string.h>
 # include <unistd.h>
 # include <arpa/inet.h>
 # include <sys/socket.h>
 # include <sys/stat.h>
+# include <sys/wait.h>
 
 # define PORT 6060
 # define CONNECTION_NBR 4

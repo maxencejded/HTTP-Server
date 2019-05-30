@@ -112,7 +112,7 @@ static int			write_connection_error(t_reponse *answer)
 	if (answer->content_type)
 		dprintf(answer->fd, "Content-Type: %s\r\n", answer->content_type);
 	if (answer->file_size)
-		dprintf(answer->fd, "Content-Length: %lld\r\n\r\n", answer->file_size);
+		dprintf(answer->fd, "Content-Length: %lu\r\n\r\n", (long unsigned int)answer->file_size);
 	if (answer->file_fd != -1)
 	{
 		while ((size = read(answer->file_fd, buff, PAGE_SIZE)) > 0)
@@ -176,7 +176,7 @@ static void			write_connection_success(t_reponse *answer)
 	if (answer->content_type)
 		dprintf(answer->fd, "Content-Type: %s\r\n", answer->content_type);
 	if (answer->file_size)
-		dprintf(answer->fd, "Content-Length: %lld\r\n\r\n", answer->file_size);
+		dprintf(answer->fd, "Content-Length: %lu\r\n\r\n", (long unsigned int)answer->file_size);
 	while ((size = read(answer->file_fd, buff, PAGE_SIZE)) > 0)
 		write(answer->fd, buff, size);
 }
@@ -252,7 +252,7 @@ int		response(t_http *request, int fd)
 	if ((answer = reponse_init()) == NULL)
 		return (end_connection_error(request, INTERNAL_SERVER_ERROR, fd, NULL));
 	answer->fd = fd;
-	if ((request->method < 0 || request->method > 4))
+	if (request->method == 0 || request->method > METHOD_PUT)
 		return (end_connection_error(request, NOT_IMPLEMENTED, fd, answer));
 	concatted = concat(WEBSITE_FOLDER_PATH, request->path);
 	if ((!request->path || stat(concatted, &sb) == -1) && ft_free(concatted) == 0)
