@@ -25,7 +25,7 @@ typedef struct		s_method
 int					http_free(t_http *data);
 
 t_http				*header(int fd, char *request, int *status);
-uint8_t		        method(char *method, t_http *data);
+uint8_t				method(char *method, t_http *data);
 
 typedef struct		s_fields
 {
@@ -76,7 +76,6 @@ void				fields_user_agent(char *str, t_http *data);
 void				fields_upgrade(char *str, t_http *data);
 void				fields_via(char *str, t_http *data);
 void				fields_warning(char *str, t_http *data);
-
 
 typedef struct		s_post_content
 {

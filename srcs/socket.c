@@ -1,8 +1,8 @@
 #include "server.h"
 
 /*
- * Open a socket with the protocol TCP and set the socket to reuse the address
- * If successful, return the new fd. Otherwise, a -1 is returned to indicate an error.
+** Open a socket with the protocol TCP and set the socket to reuse the address
+** If successful, return fd. Otherwise, a -1 is returned to indicate an error.
 */
 
 int			socket_int(void)
@@ -31,8 +31,8 @@ int			socket_int(void)
 }
 
 /*
- * Assign a name to a socket
- * If successful, return 1. Otherwise, a 0 is returned to indicate an error.
+** Assign a name to a socket
+** If successful, return 1. Otherwise, a 0 is returned to indicate an error.
 */
 
 int			socket_bind(int fd, int port, char **address)
@@ -53,17 +53,19 @@ int			socket_bind(int fd, int port, char **address)
 }
 
 /*
- * Set time-out of TIME_OUT seconds for the socket
- * If successful, return 1. Otherwise, a 0 is returned to indicate an error.
+** Set time-out of TIME_OUT seconds for the socket
+** If successful, return 1. Otherwise, a 0 is returned to indicate an error.
 */
 
 static int	socket_timeout(int fd)
 {
+	socklen_t		size;
 	struct timeval	delay;
 
+	size = sizeof(struct timeval);
 	bzero(&delay, sizeof(struct timeval));
-    delay.tv_sec = TIME_OUT;
-	if (setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, (char *)&delay, sizeof(struct timeval)) == -1)
+	delay.tv_sec = TIME_OUT;
+	if (setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, (char *)&delay, size) == -1)
 	{
 		perror("ERROR: Setsockopt(SO_RCVTIMEO)");
 		return (0);
@@ -72,9 +74,9 @@ static int	socket_timeout(int fd)
 }
 
 /*
- * Block SIGPIPE for the socket. If the client close the connection
- * in the middle of transmission, the write cause a SIGPIPE.
- * If successful, return 1. Otherwise, a 0 is returned to indicate an error.
+** Block SIGPIPE for the socket. If the client close the connection
+** in the middle of transmission, the write cause a SIGPIPE.
+** If successful, return 1. Otherwise, a 0 is returned to indicate an error.
 */
 
 static int	socket_sigpipe(int fd)
@@ -90,8 +92,8 @@ static int	socket_sigpipe(int fd)
 }
 
 /*
- * Accept new socket from incoming connection.
- * If successful, return the new fd. Otherwise, a -1 is returned to indicate an error.
+** Accept new socket from incoming connection.
+** If successful, return fd. Otherwise, a -1 is returned to indicate an error.
 */
 
 int			socket_accept(int fd, char **address)

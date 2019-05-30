@@ -14,7 +14,7 @@
 # include <sys/wait.h>
 
 /*
- * HTTP Server base
+** HTTP Server configuration
 */
 
 # define PORT			6060

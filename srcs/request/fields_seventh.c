@@ -29,4 +29,3 @@ void				fields_warning(char *str, t_http *data)
 	(void)str;
 	(void)data;
 }
-

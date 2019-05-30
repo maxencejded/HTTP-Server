@@ -1,42 +1,42 @@
 #include "server.h"
 
 /*
- * Add the connection into a new process
- * If successful, return 1. Otherwise, a 0 is returned to indicate an error.
+** Add the connection into a new process
+** If successful, return 1. Otherwise, a 0 is returned to indicate an error.
 */
 
 static int		connection_add(int fd, char *address, uint16_t connect)
 {
 	int			response;
-	// pid_t		pid;
+	pid_t		process;
 
 	response = 200;
-	// signal(SIGCHLD, sigchld);
-	// if ((pid = fork()) == 0)
-	// {
+	signal(SIGCHLD, sigchld);
+	if ((process = fork()) == 0)
+	{
 		printf("[%d] At Address: %s\n", connect, address);
 		receive(fd, &response);
 		printf("[%d] Close with status: %d\n", connect, response);
 		close(fd);
-		// _exit(close(fd));
-	// }
-	// close(fd);
-	// if (pid < 0)
-	// {
-	// 	perror("ERROR: Fork");
-	// 	strdel(&address);
-	// 	return (0);
-	// }
+		_exit(close(fd));
+	}
+	close(fd);
+	if (process < 0)
+	{
+		perror("ERROR: Fork");
+		strdel(&address);
+		return (0);
+	}
 	strdel(&address);
 	return (1);
 }
 
 /*
- * Accept the incoming connection
- * If successful, return 1. Otherwise, a 0 is returned to indicate an error.
+** Accept the incoming connection
+** If successful, return 1. Otherwise, a 0 is returned to indicate an error.
 */
 
-static int		loop()
+static int		loop(void)
 {
 	int			fd;
 	char		*address;
@@ -58,14 +58,14 @@ static int		loop()
 	return (1);
 }
 
-int			g_fd;
+int				g_fd;
 
 /*
- * Start a HTTP server listenning on the port PORT
- * If successful, return 0. Otherwise, the program quit with EXIT_FAILURE.
+** Start a HTTP server listenning on the port PORT
+** If successful, return 0. Otherwise, the program quit with EXIT_FAILURE.
 */
 
-int			main(int argc, char **argv)
+int				main(int argc, char **argv)
 {
 	char	*address;
 

@@ -80,6 +80,6 @@ int		response(t_http *request, int fd);
 char	*protocol_version(uint8_t protocol);
 int		check_content_type(t_http *request, char *complete_path);
 char	*get_content_type(t_http *request, char *complete_path);
-int		create_partial_answer(int fd, t_http *data, int reponse);
+int		response_error(int fd, t_http *data, int reponse);
 
 #endif /* RESPONSE_H */

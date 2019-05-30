@@ -218,7 +218,7 @@ static int			end_connection_success(t_http *request, int reponse, int fd, t_repo
  * Function which can be called by the server to print an error
 */
 
-int				create_partial_answer(int fd, t_http *request, int reponse)
+int				response_error(int fd, t_http *request, int reponse)
 {
 	t_reponse	*answer;
 

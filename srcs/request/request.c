@@ -45,20 +45,20 @@ static uint32_t		header_next(char *str)
 
 t_http				*header(int fd, char *request, int *status)
 {
-	uint32_t		index;
+	uint32_t	index;
 	t_http		*header;
 
 	if (request == NULL)
 		return (NULL);
 	if ((header = http_init()) == NULL)
 	{
-		*status = create_partial_answer(fd, NULL, INTERNAL_SERVER_ERROR);
+		*status = response_error(fd, NULL, INTERNAL_SERVER_ERROR);
 		return (NULL);
 	}
 	index = header_next(request);
 	if (method(request, header) == 0)
 	{
-		*status = create_partial_answer(fd, header, NOT_IMPLEMENTED);
+		*status = response_error(fd, header, NOT_IMPLEMENTED);
 		return (NULL);
 	}
 	request = request + index;

@@ -1,7 +1,7 @@
 #include "server.h"
 
 /*
- * Exit the server
+** Exit the server.
 */
 
 void		exit_server(void)
@@ -11,8 +11,9 @@ void		exit_server(void)
 }
 
 /*
- * Stop the server when signal SIGINT is send
+** Stop the server when signal SIGINT is send.
 */
+
 void		sigstop(int sig)
 {
 	(void)sig;
@@ -21,7 +22,7 @@ void		sigstop(int sig)
 }
 
 /*
- * Check if any zombie process exist and close it.
+** Check if any zombie process exist and close it.
 */
 
 void		sigchld(int sig)

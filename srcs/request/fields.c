@@ -42,16 +42,16 @@ static t_fields		fields[FIELDS_SIZE] = {
 };
 */
 
-# define FIELDS_SIZE	4
+#define FIELDS_SIZE		4
 
 uint8_t		fields_dispatch(char *str, t_http *data)
 {
 	uint8_t				i;
 	uint8_t				len;
 	static t_fields		fields[FIELDS_SIZE] = {
-		{"Accept:", &fields_accept},	
+		{"Accept:", &fields_accept},
 		{"Content-Length:", &fields_content_length},
-		{"Content-Type:", &fields_content_type},	
+		{"Content-Type:", &fields_content_type},
 		{"Cookie:", &fields_cookie}
 	};
 
