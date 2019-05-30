@@ -1,9 +1,14 @@
 #include "server.h"
 
+/*
+ * Open a socket with the protocol TCP and set the socket to reuse the address
+ * If successful, return the new fd. Otherwise, a -1 is returned to indicate an error.
+*/
+
 int			socket_int(void)
 {
 	int					num;
-	int					sock_fd;
+	int					fd;
 	struct protoent		*proto;
 
 	if ((proto = getprotobyname("TCP")) == 0)
@@ -11,19 +16,24 @@ int			socket_int(void)
 		perror("ERROR: Protocol");
 		return (-1);
 	}
-	if ((sock_fd = socket(PF_INET, SOCK_STREAM, proto->p_proto)) == -1)
+	if ((fd = socket(PF_INET, SOCK_STREAM, proto->p_proto)) == -1)
 	{
 		perror("ERROR: Socket");
 		return (-1);
 	}
 	num = 1;
-	if (setsockopt(sock_fd, SOL_SOCKET, SO_REUSEADDR, &num, sizeof(int)) == -1)
+	if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &num, sizeof(int)) == -1)
 	{
 		perror("ERROR: Setsockopt(SO_REUSEADDR)");
 		return (-1);
 	}
-	return (sock_fd);
+	return (fd);
 }
+
+/*
+ * Assign a name to a socket
+ * If successful, return 1. Otherwise, a 0 is returned to indicate an error.
+*/
 
 int			socket_bind(int fd, int port, char **address)
 {
@@ -42,34 +52,65 @@ int			socket_bind(int fd, int port, char **address)
 	return (1);
 }
 
+/*
+ * Set time-out of TIME_OUT seconds for the socket
+ * If successful, return 1. Otherwise, a 0 is returned to indicate an error.
+*/
+
+static int	socket_timeout(int fd)
+{
+	struct timeval	delay;
+
+	bzero(&delay, sizeof(struct timeval));
+    delay.tv_sec = TIME_OUT;
+	if (setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, (char *)&delay, sizeof(struct timeval)) == -1)
+	{
+		perror("ERROR: Setsockopt(SO_RCVTIMEO)");
+		return (0);
+	}
+	return (1);
+}
+
+/*
+ * Block SIGPIPE for the socket. If the client close the connection
+ * in the middle of transmission, the write cause a SIGPIPE.
+ * If successful, return 1. Otherwise, a 0 is returned to indicate an error.
+*/
+
+static int	socket_sigpipe(int fd)
+{
+	int		pipe;
+
+	if (setsockopt(fd, SOL_SOCKET, SO_NOSIGPIPE, &pipe, sizeof(int)) == -1)
+	{
+		perror("ERROR: Setsockopt(SO_NOSIGPIPE)");
+		return (0);
+	}
+	return (1);
+}
+
+/*
+ * Accept new socket from incoming connection.
+ * If successful, return the new fd. Otherwise, a -1 is returned to indicate an error.
+*/
+
 int			socket_accept(int fd, char **address)
 {
 	int					sock;
-	int					sigpipe;
 	socklen_t			sock_len;
-	struct timeval		timeout;      
 	struct sockaddr_in	sock_init;
 
 	sock_len = sizeof(struct sockaddr_in);
 	bzero(&sock_init, sizeof(struct sockaddr_in));
-	sock = accept(fd, (struct sockaddr *)&sock_init, &sock_len);
-	if (sock == -1)
+	if ((sock = accept(fd, (struct sockaddr *)&sock_init, &sock_len)) == -1)
 	{
 		perror("ERROR: Accept");
 		return (-1);
 	}
-	bzero(&timeout, sizeof(struct timeval));
-    timeout.tv_sec = 10;
-	if (setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(struct timeval)) == -1)
-	{
-		perror("ERROR: Setsockopt(SO_RCVTIMEO)");
+	if (socket_timeout(sock) == 0)
 		return (-1);
-	}
-	if (setsockopt(sock, SOL_SOCKET, SO_NOSIGPIPE, &sigpipe, sizeof(int)) == -1)
-	{
-		perror("ERROR: Setsockopt(SO_NOSIGPIPE)");
+	if (socket_sigpipe(sock) == 0)
 		return (-1);
-	}
 	*address = strdup(inet_ntoa(sock_init.sin_addr));
 	return (sock);
 }

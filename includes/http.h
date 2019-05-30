@@ -13,16 +13,15 @@
 # include <sys/stat.h>
 # include <sys/wait.h>
 
-# define PORT 6060
-# define CONNECTION_NBR 4
-# define BUFF_SOCKET	getpagesize()
+/*
+ * HTTP Server base
+*/
+
+# define PORT			6060
+# define CONNECTION		4
+# define TIME_OUT		10
+
 # define PAGE_SIZE		getpagesize()
-
-// # pragma pack(2)
-
-# define PROTOCOL_1_0	1
-# define PROTOCOL_1_1	2
-# define PROTOCOL_2_0	3
 
 typedef struct		s_http
 {
@@ -37,7 +36,7 @@ typedef struct		s_http
 	uint8_t			*content;
 }					t_http;
 
-extern int			sock_fd;
+extern int			g_fd;
 
 int					socket_int(void);
 int					socket_bind(int fd, int port, char **address);
@@ -46,7 +45,6 @@ int					socket_accept(int fd, char **address);
 int					receive(int fd, int *status);
 
 void				exit_server(void);
-void				sigpipe(int sig);
 void				sigstop(int sig);
 void				sigchld(int sig);
 

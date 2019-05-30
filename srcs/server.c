@@ -1,11 +1,17 @@
 #include "server.h"
 
-int				connection_add(int fd, char *address, uint16_t connect)
+/*
+ * Add the connection into a new process
+ * If successful, return 1. Otherwise, a 0 is returned to indicate an error.
+*/
+
+static int		connection_add(int fd, char *address, uint16_t connect)
 {
 	int			response;
 	// pid_t		pid;
 
 	response = 200;
+	// signal(SIGCHLD, sigchld);
 	// if ((pid = fork()) == 0)
 	// {
 		printf("[%d] At Address: %s\n", connect, address);
@@ -14,7 +20,8 @@ int				connection_add(int fd, char *address, uint16_t connect)
 		close(fd);
 		// _exit(close(fd));
 	// }
-	// else if (pid < 0)
+	// close(fd);
+	// if (pid < 0)
 	// {
 	// 	perror("ERROR: Fork");
 	// 	strdel(&address);
@@ -24,23 +31,26 @@ int				connection_add(int fd, char *address, uint16_t connect)
 	return (1);
 }
 
-int				loop(int fd)
+/*
+ * Accept the incoming connection
+ * If successful, return 1. Otherwise, a 0 is returned to indicate an error.
+*/
+
+static int		loop()
 {
-	int			sock_new;
+	int			fd;
 	char		*address;
 	uint16_t	connect;
 
 	connect = 0;
 	address = NULL;
-	signal(SIGCHLD, sigchld);
-	while ((sock_new = socket_accept(fd, &address)) > 0)
+	while ((fd = socket_accept(g_fd, &address)) > 0)
 	{
-		if (connection_add(sock_new, address, connect) == 0)
+		if (connection_add(fd, address, connect) == 0)
 			return (0);
-		close(sock_new);
 		++connect;
 	}
-	if (sock_new == -1)
+	if (fd == -1)
 	{
 		perror("ERROR: Accept");
 		exit_server();
@@ -48,7 +58,12 @@ int				loop(int fd)
 	return (1);
 }
 
-int			sock_fd;
+int			g_fd;
+
+/*
+ * Start a HTTP server listenning on the port PORT
+ * If successful, return 0. Otherwise, the program quit with EXIT_FAILURE.
+*/
 
 int			main(int argc, char **argv)
 {
@@ -60,17 +75,17 @@ int			main(int argc, char **argv)
 		printf("Usage: ./server\n");
 		exit(EXIT_FAILURE);
 	}
-	if ((sock_fd = socket_int()) == -1)
+	if ((g_fd = socket_int()) == -1)
 		exit(EXIT_FAILURE);
-	if (socket_bind(sock_fd, PORT, &address) == 0)
+	if (socket_bind(g_fd, PORT, &address) == 0)
 		exit_server();
-	if (listen(sock_fd, CONNECTION_NBR) == -1)
+	if (listen(g_fd, CONNECTION) == -1)
 		exit_server();
 	printf("Starting new Server\nAdrress: %s:%d\n", address, PORT);
 	strdel(&address);
 	signal(SIGINT, sigstop);
-	if (loop(sock_fd) == 0)
+	if (loop() == 0)
 		exit_server();
-	close(sock_fd);
+	close(g_fd);
 	return (0);
 }

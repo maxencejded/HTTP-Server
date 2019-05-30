@@ -7,7 +7,7 @@
 
 static int			receive_content(int fd, t_http *data, uint8_t *str, ssize_t size)
 {
-	uint8_t		buff[BUFF_SOCKET];
+	uint8_t		buff[PAGE_SIZE];
 	uint8_t		*content;
 	ssize_t		total;
 
@@ -17,7 +17,7 @@ static int			receive_content(int fd, t_http *data, uint8_t *str, ssize_t size)
 	bzero(data->content, sizeof(uint8_t) * data->content_length);
 	memcpy(data->content, str, size);
 	content = data->content + size;
-	while (total < data->content_length && (size = recv(fd, buff, BUFF_SOCKET, 0)) > 0)
+	while (total < data->content_length && (size = recv(fd, buff, PAGE_SIZE, 0)) > 0)
 	{
 		total += size;
 		if (total > data->content_length)
@@ -27,7 +27,7 @@ static int			receive_content(int fd, t_http *data, uint8_t *str, ssize_t size)
 	}
 	if (total != data->content_length)
 		return (create_partial_answer(fd, data, BAD_REQUEST));
-	return (202);
+	return (ACCEPTED);
 }
 
 /*
@@ -55,10 +55,10 @@ static int			header_malloc(uint8_t *buff, uint8_t **header, uint8_t **end, ssize
 static ssize_t		receive_header(int fd, uint8_t **header, uint8_t **end, int *status)
 {
 	ssize_t		size;
-	uint8_t		buff[BUFF_SOCKET];
+	uint8_t		buff[PAGE_SIZE];
 
-	bzero(buff, BUFF_SOCKET);
-	if ((size = recv(fd, buff, (BUFF_SOCKET - 1), 0)) > 0)
+	bzero(buff, PAGE_SIZE);
+	if ((size = recv(fd, buff, (PAGE_SIZE - 1), 0)) > 0)
 	{
 		if (strstr((const char *)buff, "\r\n\r\n") == NULL)
 		{
@@ -98,7 +98,7 @@ int					receive(int fd, int *status)
 		return (0);
 	if (request && request->content_length)
 	{
-		if ((*status = receive_content(fd, request, end, size - (end - buf))) != 202)
+		if ((*status = receive_content(fd, request, end, size - (end - buf))) != ACCEPTED)
 		{
 			free(buf);
 			return (0);

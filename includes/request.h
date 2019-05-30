@@ -6,6 +6,10 @@
 # include "libft.h"
 # include "http.h"
 
+# define PROTOCOL_1_0	1
+# define PROTOCOL_1_1	2
+# define PROTOCOL_2_0	3
+
 # define METHOD_GET		1
 # define METHOD_HEAD	2
 # define METHOD_POST	3
