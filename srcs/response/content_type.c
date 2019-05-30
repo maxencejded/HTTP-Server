@@ -1,22 +1,28 @@
 #include "server.h"
 
 /*
- * If the content type is correctly formated and match the file format, returns 0
- * Otherwise will return an error and provoq a BAD_REQUEST exception (erroror 400)
- *
- *
- * Examples for request->accept :
- * [text/html,application/xhtml+xml,application/xml;q=0.9,*\*;q=0.8]
- * [audio/webm,audio/ogg,audio/wav,audio\*;q=0.9,application/ogg;q=0.7,video\*;q=0.6,*\*;q=0.5]
- *
- * \ are to be replaced by / unfortunately cant comment with these.
+** If the argument is allocated, will free it
+** Always return 0
 */
 
 static int		ft_free(char *accepted)
 {
-	free(accepted);
+	if (accepted)
+		free(accepted);
 	return (0);
 }
+
+/*
+** If the content type is correctly formated and match the file format, returns 0
+** Otherwise will return an error and provoq a BAD_REQUEST exception (erroror 400)
+**
+**
+** Examples for request->accept :
+** [text/html,application/xhtml+xml,application/xml;q=0.9,*\*;q=0.8]
+** [audio/webm,audio/ogg,audio/wav,audio\*;q=0.9,application/ogg;q=0.7,video\*;q=0.6,*\*;q=0.5]
+**
+** \ are to be replaced by / unfortunately cant comment with these.
+*/
 
 int				check_content_type(t_http *request, char *complete_path)
 {
@@ -28,7 +34,7 @@ int				check_content_type(t_http *request, char *complete_path)
 	n = -1;
 
 /*
- * Initialising all my different variables, if one fails, returns an error
+** Initialising all my different variables, if one fails, returns an error
 */
 
 	if (!request || !request->accept)
@@ -39,7 +45,7 @@ int				check_content_type(t_http *request, char *complete_path)
 		return (-1);
 
 /*
- * Filling the accepted string with the well parsed request->accept
+** Filling the accepted string with the well parsed request->accept
 */
 
 	while (++i < accept_size)
@@ -53,17 +59,17 @@ int				check_content_type(t_http *request, char *complete_path)
 	accepted[++n] = '\0';
 
 /*
- * Accepted string has this format now:
- * 
- * [audio/webm audio/ogg audio/wav audio\* application/ogg video\* *\*]
- * [audio/webm audio/ogg audio/wav audio\* application/ogg video\* *\*]
- *
- * The best format are sorted by order and separated by spaces, we can now
- * check the extension of the path to check if the format is corresponding
+** Accepted string has this format now:
+** 
+** [audio/webm audio/ogg audio/wav audio\* application/ogg video\* *\*]
+** [audio/webm audio/ogg audio/wav audio\* application/ogg video\* *\*]
+**
+** The best format are sorted by order and separated by spaces, we can now
+** check the extension of the path to check if the format is corresponding
 */
 
 /*
- * Getting the file_extension of the file called
+** Getting the file_extension of the file called
 */
 
 	i = -1;
@@ -76,8 +82,8 @@ int				check_content_type(t_http *request, char *complete_path)
 		return (-1);
 
 /*
- * Getting the file_extension accepted in best order and comparing them
- * with the file_extension of the file called
+** Getting the file_extension accepted in best order and comparing them
+** with the file_extension of the file called
 */
 
 	i = -1;
@@ -100,6 +106,12 @@ int				check_content_type(t_http *request, char *complete_path)
 	free(accepted);
 	return (-1);
 }
+
+/*
+** Called only if the check was correct
+** Will be return an error 500 in case of an allocation error otherwise
+** will return the extension found
+*/
 
 char			*get_content_type(t_http *request, char *complete_path)
 {
