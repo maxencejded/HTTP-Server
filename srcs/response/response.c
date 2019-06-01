@@ -5,16 +5,22 @@
 #include <fcntl.h>
 
 /*
- * Return value of the different method implemented
- * Get method -> 1
- * Head method -> 2
- * Post method -> 3
- * Put method -> 4
+** Return value of the different method implemented
+** Get method -> 1
+** Head method -> 2
+** Post method -> 3
+** Put method -> 4
 */
 
 /*
- * Ip of the server of dev:
- * 127.0.0.1:6060
+** Ip of the server of dev:
+** 127.0.0.1:6060
+*/
+
+/*
+** Function to get the current date for the response header
+** In case of malloc error will return an error 500
+** Returns an allocated char *
 */
 
 static char			*get_date()
@@ -33,7 +39,7 @@ static char			*get_date()
 }
 
 /*
- * Freeing response structure
+** Freeing response structure
 */
 
 static int			reponse_free(t_reponse *answer)
@@ -51,6 +57,11 @@ static int			reponse_free(t_reponse *answer)
 	return (0);
 }
 
+/*
+** Free a char * if it exists
+** Always return 0
+*/
+
 static int			ft_free(char *to_free)
 {
 	if (to_free)
@@ -59,7 +70,7 @@ static int			ft_free(char *to_free)
 }
 
 /*
- * Initializing response structure not in use right now
+** Initializing response structure not in use right now
 */
 
 static t_reponse	*reponse_init(void)
@@ -74,7 +85,7 @@ static t_reponse	*reponse_init(void)
 }
 
 /*
- * print the reponse message linked to the value
+** Print the reponse message linked to the value of the reponse sent
 */
 
 static char		*get_reponse_message(int reponse)
@@ -90,8 +101,9 @@ static char		*get_reponse_message(int reponse)
 }
 
 /*
- * Function to write the content of the error page linked to the error in 
- * case of unsuccesful connection
+** Function to write the content of the error page linked to the error in 
+** case of unsuccesful connection
+** Return the error response value
 */
 
 static int			write_connection_error(t_reponse *answer)
@@ -124,8 +136,8 @@ static int			write_connection_error(t_reponse *answer)
 }
 
 /*
- * Handling bad responses closing the connection
- * Return the error status implemented
+** Handling bad responses closing the connection
+** Return the error status implemented
 */
 
 static int			end_connection_error(t_http *request, int reponse, int fd, t_reponse *answer)
@@ -155,8 +167,8 @@ static int			end_connection_error(t_http *request, int reponse, int fd, t_repons
 }
 
 /*
- * Function to write the content to the fd of the socket in case of 
- * succesful connection
+** Function to write the content to the fd of the socket in case of 
+** succesful connection
 */
 
 static void			write_connection_success(t_reponse *answer)
@@ -182,9 +194,10 @@ static void			write_connection_success(t_reponse *answer)
 }
 
 /*
- * Handling succesful responses and closing the connection
- * In case of error, will link the connection success to the connection error 
- * function.
+** Handling succesful responses and closing the connection
+** In case of error, will link the connection success to the connection error 
+** function.
+** Return the success status implemented
 */
 
 static int			end_connection_success(t_http *request, int reponse, int fd, t_reponse *answer)
@@ -215,7 +228,8 @@ static int			end_connection_success(t_http *request, int reponse, int fd, t_repo
 }
 
 /*
- * Function which can be called by the server to print an error
+** Function which can be called by the server to print an error
+** Returns the error status implemented
 */
 
 int				response_error(int fd, t_http *request, int reponse)
@@ -237,8 +251,9 @@ int				response_error(int fd, t_http *request, int reponse)
 }
 
 /*
- * Main thread for every call to the server, will transform the request to
- * a reponse after having perfeomed it
+** Main thread for every call to the server, will transform the request to
+** a reponse after having perfeomed it
+** Returns an int matching the response answer.
 */
 
 int		response(t_http *request, int fd)
