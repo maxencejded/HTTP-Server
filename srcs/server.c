@@ -17,7 +17,6 @@ static int		connection_add(int fd, char *address, uint16_t connect)
 		printf("[%d] At Address: %s\n", connect, address);
 		receive(fd, &response);
 		printf("[%d] Close with status: %d\n", connect, response);
-		close(fd);
 		_exit(close(fd));
 	}
 	close(fd);

@@ -15,7 +15,7 @@ static int		request_data(int fd, t_http *data, uint8_t *str, ssize_t size)
 	data->content = (uint8_t *)malloc(sizeof(uint8_t) * data->content_length);
 	if (data->content == NULL)
 		return (response_error(fd, data, INTERNAL_SERVER_ERROR));
-	bzero(data->content, sizeof(uint8_t) * data->content_length);
+	memset(data->content, 0, sizeof(uint8_t) * data->content_length);
 	memcpy(data->content, str, size);
 	content = data->content + size;
 	if (total < data->content_length)
@@ -45,7 +45,7 @@ static int		copy(uint8_t *buff, uint8_t **data, uint8_t **end, ssize_t size)
 		return (0);
 	memcpy(*data, buff, size);
 	*end = (uint8_t *)strstr((const char *)*data, "\r\n\r\n");
-	bzero(*end, sizeof(uint8_t) * 4);
+	memset(*end, 0, sizeof(uint8_t) * 4);
 	*end = *end + 4;
 	return (1);
 }
@@ -62,7 +62,7 @@ static ssize_t	request_read(int fd, uint8_t **data, uint8_t **end, int *status)
 	ssize_t		size;
 	uint8_t		buff[PAGE_SIZE];
 
-	bzero(buff, PAGE_SIZE);
+	memset(buff, 0, PAGE_SIZE);
 	if ((size = recv(fd, buff, (PAGE_SIZE - 1), 0)) > 0)
 	{
 		if (strstr((const char *)buff, "\r\n\r\n") == NULL)

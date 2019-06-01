@@ -27,7 +27,7 @@ static char			*get_date()
 	tm = localtime(&t);
 	if ((date = malloc(sizeof(char) * 30)) == NULL)
 		return (NULL);
-	bzero(date, sizeof(char) * 30);
+	memset(date, 0, sizeof(char) * 30);
 	sprintf(date, "%d-%d-%d %d:%d:%d", tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday, tm->tm_hour, tm->tm_min, tm->tm_sec);
 	return (date);
 }
@@ -68,7 +68,7 @@ static t_reponse	*reponse_init(void)
 
 	if ((answer = (t_reponse *)malloc(sizeof(t_reponse))) == NULL)
 		return (NULL);
-	bzero(answer, sizeof(t_reponse));
+	memset(answer, 0, sizeof(t_reponse));
 	answer->file_fd = -1;
 	return (answer);
 }

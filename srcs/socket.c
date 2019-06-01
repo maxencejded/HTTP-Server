@@ -39,7 +39,7 @@ int			socket_bind(int fd, int port, char **address)
 {
 	struct sockaddr_in	bind_s;
 
-	bzero(&bind_s, sizeof(struct sockaddr_in));
+	memset(&bind_s, 0, sizeof(struct sockaddr_in));
 	bind_s.sin_family = AF_INET;
 	bind_s.sin_port = htons(port);
 	bind_s.sin_addr.s_addr = htonl(INADDR_ANY);
@@ -63,7 +63,7 @@ static int	socket_timeout(int fd)
 	struct timeval	delay;
 
 	size = sizeof(struct timeval);
-	bzero(&delay, sizeof(struct timeval));
+	memset(&delay, 0, sizeof(struct timeval));
 	delay.tv_sec = TIME_OUT;
 	if (setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, (char *)&delay, size) == -1)
 	{
@@ -83,6 +83,7 @@ static int	socket_sigpipe(int fd)
 {
 	int		pipe;
 
+	pipe = 1;
 	if (setsockopt(fd, SOL_SOCKET, SO_NOSIGPIPE, &pipe, sizeof(int)) == -1)
 	{
 		perror("ERROR: Setsockopt(SO_NOSIGPIPE)");
@@ -103,7 +104,7 @@ int			socket_accept(int fd, char **address)
 	struct sockaddr_in	sock_init;
 
 	sock_len = sizeof(struct sockaddr_in);
-	bzero(&sock_init, sizeof(struct sockaddr_in));
+	memset(&sock_init, 0, sizeof(struct sockaddr_in));
 	if ((sock = accept(fd, (struct sockaddr *)&sock_init, &sock_len)) == -1)
 	{
 		perror("ERROR: Accept");

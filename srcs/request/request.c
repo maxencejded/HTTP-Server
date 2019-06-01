@@ -6,7 +6,7 @@ static t_http		*http_init(void)
 
 	if ((data = (t_http *)malloc(sizeof(t_http))) == NULL)
 		return (NULL);
-	bzero(data, sizeof(t_http));
+	memset(data, 0, sizeof(t_http));
 	return (data);
 }
 
