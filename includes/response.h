@@ -7,8 +7,9 @@
 # include <string.h>
 # include <unistd.h>
 # include <sys/stat.h>
-#include <sys/types.h>
-#include <time.h>
+# include <sys/types.h>
+# include <time.h>
+# include <fcntl.h>
 
 # include "libft.h"
 # include "http.h"
@@ -26,14 +27,15 @@ typedef struct		s_response
 }					t_reponse;
 
 /*
- * Environment variables
+** Environment variables
 */
 
+# define IER					500
 # define WEBSITE_FOLDER_PATH	"site"
 # define ERROR_FOLDER_PATH		"error_pages/"
 
 /*
- * SUCCESS
+** SUCCESS
 */
 
 # define OK						200
@@ -43,7 +45,7 @@ typedef struct		s_response
 # define PARTIAL_CONTENT		206
 
 /*
- * Redirections
+** Redirections
 */
 
 # define MULTIPLE_CHOICES		300
@@ -52,7 +54,7 @@ typedef struct		s_response
 # define PERMANENT_REDIRECT		308
 
 /*
- * Request Error
+** Request Error
 */
 
 # define BAD_REQUEST			400
@@ -64,7 +66,7 @@ typedef struct		s_response
 # define ENTITY_TOO_LARGE		413
 
 /*
- * Server Error
+** Server Error
 */
 
 # define INTERNAL_SERVER_ERROR	500
@@ -73,13 +75,27 @@ typedef struct		s_response
 # define SERVICE_UNAVAILABLE	503
 
 /*
- * Response function definition
+** Response function definition
 */
 
-int		response(t_http *request, int fd);
-char	*protocol_version(uint8_t protocol);
-int		check_content_type(t_http *request, char *complete_path);
-char	*get_content_type(t_http *request, char *complete_path);
-int		response_error(int fd, t_http *data, int reponse);
+int					response(t_http *request, int fd);
+char				*protocol_version(uint8_t protocol);
+int					check_content_type(t_http *request, char *complete_path);
+char				*get_content_type(t_http *request, char *complete_path);
+int					response_error(int fd, t_http *data, int reponse);
+int					end_connection_success(t_http *request, int reponse, int fd,
+		t_reponse *answer);
+int					end_connection_error(t_http *request, int reponse, int fd,
+		t_reponse *answer);
+char				*get_reponse_message(int reponse);
 
-#endif /* RESPONSE_H */
+/*
+** Function used to create valid header
+*/
+
+t_reponse			*reponse_init(void);
+char				*get_date(void);
+int					reponse_free(t_reponse *answer);
+int					ft_free(char *to_free);
+
+#endif

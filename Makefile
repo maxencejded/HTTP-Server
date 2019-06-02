@@ -9,7 +9,8 @@ REQUEST			= request.c method.c
 FIELD			= field_accept.c field_content_length.c field_content_type.c\
 					field_expect.c field_host.c
 FIELDS			= fields.c $(FIELD)
-RESPONSE		= response.c protocol.c content_type.c
+RESPONSE		= response.c protocol.c content_type.c ft_free.c\
+					response_error.c response_success.c
 LIBFT			= strdel.c concat.c get_file_content.c
 
 REQUEST_FCT		= $(addprefix request/, $(REQUEST) $(FIELDS))
