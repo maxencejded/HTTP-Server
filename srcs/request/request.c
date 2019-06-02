@@ -16,6 +16,7 @@ int					http_free(t_http *data)
 		return (1);
 	free(data->path);
 	free(data->accept);
+	free(data->boundary);
 	free(data->content);
 	free(data);
 	return (1);

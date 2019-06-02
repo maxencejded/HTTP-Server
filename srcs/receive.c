@@ -5,32 +5,61 @@
 ** If successful, return OK. Otherwise, an appropriate code error is returned.
 */
 
+// static int		request_data(int fd, t_http *data, uint8_t *str, ssize_t size)
+// {
+// 	uint8_t		buff[PAGE_SIZE];
+// 	uint8_t		*content;
+// 	ssize_t		total;
+
+// 	total = size;
+// 	data->content = (uint8_t *)malloc(sizeof(uint8_t) * data->content_length);
+// 	if (data->content == NULL)
+// 		return (response_error(fd, data, INTERNAL_SERVER_ERROR));
+// 	memset(data->content, 0, sizeof(uint8_t) * data->content_length);
+// 	memcpy(data->content, str, size);
+// 	content = data->content + size;
+// 	if (total < data->content_length)
+// 	{
+// 		while ((size = recv(fd, buff, PAGE_SIZE, 0)) > 0)
+// 		{
+// 			total += size;
+// 			if (total > data->content_length)
+// 				break ;
+// 			memcpy(content, buff, size);
+// 			content = content + size;
+// 		}
+// 	}
+// 	if (total != data->content_length)
+// 		return (response_error(fd, data, BAD_REQUEST));
+// 	return (ACCEPTED);
+// }
+
+#define CACHE_FILENAME "./cache.tmp"
+
 static int		request_data(int fd, t_http *data, uint8_t *str, ssize_t size)
 {
 	uint8_t		buff[PAGE_SIZE];
-	uint8_t		*content;
-	ssize_t		total;
+	size_t		total;
+	int			fd_out;
 
 	total = size;
-	data->content = (uint8_t *)malloc(sizeof(uint8_t) * data->content_length);
-	if (data->content == NULL)
-		return (response_error(fd, data, INTERNAL_SERVER_ERROR));
-	memset(data->content, 0, sizeof(uint8_t) * data->content_length);
-	memcpy(data->content, str, size);
-	content = data->content + size;
-	if (total < data->content_length)
+	if ((fd_out = open(CACHE_FILENAME, O_RDWR | O_CREAT | O_TRUNC, 0660)) == -1)
+		return (INTERNAL_SERVER_ERROR);
+	(size != 0) ? write(fd_out, str, size) : 0;
+	while (total < data->content_length && (size = recv(fd, buff, PAGE_SIZE, 0)) > 0)
 	{
-		while ((size = recv(fd, buff, PAGE_SIZE, 0)) > 0)
-		{
-			total += size;
-			if (total > data->content_length)
-				break ;
-			memcpy(content, buff, size);
-			content = content + size;
-		}
+		total += size;
+		if (total > data->content_length)
+			break ;
+		write(1, buff, size);
+		write(fd_out, buff, size);
 	}
+	close(fd_out);
 	if (total != data->content_length)
+	{
+		// if (remove(CACHE_FILENAME) == 0)
 		return (response_error(fd, data, BAD_REQUEST));
+	}
 	return (ACCEPTED);
 }
 
@@ -65,6 +94,7 @@ static ssize_t	request_read(int fd, uint8_t **data, uint8_t **end, int *status)
 	memset(buff, 0, PAGE_SIZE);
 	if ((size = recv(fd, buff, (PAGE_SIZE - 1), 0)) > 0)
 	{
+		write(1, buff, size);
 		if (strstr((const char *)buff, "\r\n\r\n") == NULL)
 		{
 			*status = response_error(fd, NULL, ENTITY_TOO_LARGE);
@@ -105,7 +135,7 @@ int				receive(int fd, int *status)
 		return (0);
 	if ((data = header(fd, (char *)buf, status)) == NULL)
 		return (0);
-	if (data && data->content_length)
+	if (data && data->method == METHOD_POST && data->content_length)
 	{
 		*status = request_data(fd, data, end, size - (end - buf));
 		if (*status != ACCEPTED)

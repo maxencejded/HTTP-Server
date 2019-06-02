@@ -6,8 +6,9 @@ INCLUDES		= -I includes
 
 BASE			= server.c socket.c receive.c signal.c
 REQUEST			= request.c method.c
-FIELDS			= fields.c fields_first.c fields_second.c fields_sixth.c fields_fifth.c\
-					fields_fourth.c fields_seventh.c fields_third.c
+FIELD			= field_accept.c field_content_length.c field_content_type.c\
+					field_expect.c field_host.c
+FIELDS			= fields.c $(FIELD)
 RESPONSE		= response.c protocol.c content_type.c
 LIBFT			= strdel.c concat.c get_file_content.c
 

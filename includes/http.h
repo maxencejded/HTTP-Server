@@ -1,6 +1,7 @@
 #ifndef HTTP_H
 # define HTTP_H
 
+# include <fcntl.h>
 # include <netdb.h>
 # include <signal.h>
 # include <stdio.h>
@@ -31,6 +32,7 @@ typedef struct		s_http
 
 	char			*accept;
 	uint8_t			content_type;
+	char			*boundary;
 
 	uint32_t		content_length;
 	uint8_t			*content;
