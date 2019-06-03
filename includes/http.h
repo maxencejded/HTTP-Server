@@ -46,6 +46,8 @@ int					socket_accept(int fd, char **address);
 
 int					receive(int fd, int *status);
 
+int					request_multipart(int fd, t_http *data, uint8_t *str, ssize_t size);
+
 void				exit_server(void);
 void				sigstop(int sig);
 void				sigchld(int sig);

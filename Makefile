@@ -5,6 +5,7 @@ CFLAGS			= -Wall -Wextra -Werror -g
 INCLUDES		= -I includes
 
 BASE			= server.c socket.c receive.c signal.c
+DATA			= request_multipart.c
 REQUEST			= request.c method.c
 FIELD			= field_accept.c field_content_length.c field_content_type.c\
 					field_expect.c field_host.c
@@ -18,7 +19,7 @@ REQUEST_FCT		= $(addprefix request/, $(REQUEST) $(FIELDS))
 RESPONSE_FCT	= $(addprefix response/, $(RESPONSE))
 LIBFT_FCT		= $(addprefix libft/, $(LIBFT))
 API_FCT			= $(addprefix api/, $(API))
-FUNCTIONS		= $(addprefix srcs/, $(BASE) $(REQUEST_FCT) $(RESPONSE_FCT)\
+FUNCTIONS		= $(addprefix srcs/, $(BASE) $(DATA) $(REQUEST_FCT) $(RESPONSE_FCT)\
 				  $(LIBFT_FCT)) $(API_FCT)
 OBJECTS			= $(FUNCTIONS:.c=.o)
 

@@ -8,24 +8,24 @@
 static int		connection_add(int fd, char *address, uint16_t connect)
 {
 	int			response;
-	pid_t		process;
+	// pid_t		process;
 
 	response = 200;
-	signal(SIGCHLD, sigchld);
-	if ((process = fork()) == 0)
-	{
+	// signal(SIGCHLD, sigchld);
+	// if ((process = fork()) == 0)
+	// {
 		printf("[%d] At Address: %s\n", connect, address);
 		receive(fd, &response);
 		printf("[%d] Close with status: %d\n", connect, response);
-		_exit(close(fd));
-	}
+	// 	_exit(close(fd));
+	// }
 	close(fd);
-	if (process < 0)
-	{
-		perror("ERROR: Fork");
-		strdel(&address);
-		return (0);
-	}
+	// if (process < 0)
+	// {
+	// 	perror("ERROR: Fork");
+	// 	strdel(&address);
+	// 	return (0);
+	// }
 	strdel(&address);
 	return (1);
 }
@@ -43,7 +43,8 @@ static int		loop(void)
 
 	connect = 0;
 	address = NULL;
-	while ((fd = socket_accept(g_fd, &address)) > 0)
+	// while ((fd = socket_accept(g_fd, &address)) > 0)
+	if ((fd = socket_accept(g_fd, &address)) > 0)
 	{
 		if (connection_add(fd, address, connect) == 0)
 			return (0);
