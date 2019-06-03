@@ -8,7 +8,7 @@ static int		boundary(char *str, t_http *data)
 		++str;
 	if (strncmp(str, "boundary=", 9) == 0)
 	{
-		if ((data->boundary = strdup(str + 9)) == NULL)
+		if ((data->boundary = concat("--", str + 9)) == NULL)
 			return (0);
 		return (1);
 	}
