@@ -33,6 +33,7 @@ typedef struct		s_response
 # define IER					500
 # define WEBSITE_FOLDER_PATH	"site"
 # define ERROR_FOLDER_PATH		"error_pages/"
+# define API_FOLDER_PATH		"api"
 
 /*
 ** SUCCESS
@@ -97,5 +98,11 @@ t_reponse			*reponse_init(void);
 char				*get_date(void);
 int					reponse_free(t_reponse *answer);
 int					ft_free(char *to_free);
+
+/*
+** API functions
+*/
+
+int					post_api(void);
 
 #endif

@@ -5,5 +5,6 @@
 # include "http.h"
 # include "request.h"
 # include "response.h"
+# include "api.h"
 
 #endif /* SERVER_H */

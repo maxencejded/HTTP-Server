@@ -12,11 +12,14 @@ FIELDS			= fields.c $(FIELD)
 RESPONSE		= response.c protocol.c content_type.c ft_free.c\
 					response_error.c response_success.c
 LIBFT			= strdel.c concat.c get_file_content.c
+API				= demo.c
 
 REQUEST_FCT		= $(addprefix request/, $(REQUEST) $(FIELDS))
 RESPONSE_FCT	= $(addprefix response/, $(RESPONSE))
 LIBFT_FCT		= $(addprefix libft/, $(LIBFT))
-FUNCTIONS		= $(addprefix srcs/, $(BASE) $(REQUEST_FCT) $(RESPONSE_FCT) $(LIBFT_FCT))
+API_FCT			= $(addprefix api/, $(API))
+FUNCTIONS		= $(addprefix srcs/, $(BASE) $(REQUEST_FCT) $(RESPONSE_FCT)\
+				  $(LIBFT_FCT)) $(API_FCT)
 OBJECTS			= $(FUNCTIONS:.c=.o)
 
 .PHONY: all $(SERVER) clean fclean re

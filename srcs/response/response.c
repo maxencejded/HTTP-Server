@@ -1,4 +1,5 @@
 #include "server.h"
+#include "api.h"
 #include "response.h"
 
 #include <time.h>
@@ -10,14 +11,10 @@
 ** Head method -> 2
 ** Post method -> 3
 ** Put method -> 4
-*/
-
-/*
+**
 ** Ip of the server of dev:
 ** 127.0.0.1:6060
-*/
-
-/*
+**
 ** Function to get the current date for the response header
 ** In case of malloc error will return an error 500
 ** Returns an allocated char *
@@ -71,6 +68,39 @@ char				*get_reponse_message(int reponse)
 }
 
 /*
+** Checking if the called URL is not present in the API folder
+*/
+
+t_api				g_api[API_COUNT] = {
+	{"demo", &demo}
+};
+
+static int			start_api_response(t_http *request, t_reponse *answer)
+{
+	char			*concatted;
+	char			*complete_path;
+	struct stat		sb;
+	int				n;
+	int				i;
+
+	concatted = concat(API_FOLDER_PATH, request->path);
+	complete_path = concat(concatted, ".c");
+	if ((!concatted || !complete_path || stat(complete_path, &sb) == -1)
+			&& ft_free(complete_path) == 0 && ft_free(concatted) == 0)
+		return (end_connection_error(request, IER, answer->fd, answer));
+	ft_free(complete_path);
+	n = strlen(concatted);
+	while (n > 0 && concatted[n] != '/')
+		--n;
+	n += 1;
+	i = -1;
+	while (++i < API_COUNT)
+		if (strcmp(&concatted[n], g_api[i].name) == 0)
+			answer->reponse = g_api[i].fct(request, answer);
+	return (answer->reponse);
+}
+
+/*
 ** Main thread for every call to the server, will transform the request to
 ** a reponse after having perfeomed it
 ** Returns an int matching the response answer.
@@ -92,7 +122,7 @@ int					response(t_http *request, int fd)
 	concatted = concat(WEBSITE_FOLDER_PATH, request->path);
 	if ((!request->path || stat(concatted, &sb) == -1) && ft_free(concatted)
 			== 0)
-		return (end_connection_error(request, NOT_FOUND, fd, answer));
+		return (start_api_response(request, answer));
 	ft_free(concatted);
 	return (end_connection_success(request, OK, fd, answer));
 }
