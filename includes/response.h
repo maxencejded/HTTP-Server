@@ -14,6 +14,8 @@
 # include "libft.h"
 # include "http.h"
 
+# define STATUS_COUNT			20
+
 typedef struct		s_response
 {
 	char			*complete_path;
@@ -74,6 +76,18 @@ typedef struct		s_response
 # define NOT_IMPLEMENTED		501
 # define BAD_GATEWAY 			502
 # define SERVICE_UNAVAILABLE	503
+
+/*
+** Structure for error message depending return value
+*/
+
+typedef struct		s_status
+{
+	int				code;
+	char			*name;
+}					t_status;
+
+extern t_status		g_status[STATUS_COUNT];
 
 /*
 ** Response function definition
