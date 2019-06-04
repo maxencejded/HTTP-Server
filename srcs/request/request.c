@@ -46,15 +46,11 @@ static uint32_t		header_next(char *str)
 	i = 0;
 	while (str[i])
 	{
-		if (str[i] == '\r')
+		if (str[i] == '\r' && str[i + 1] == '\n')
 		{
 			str[i] = '\0';
-			if (str[++i] == '\n')
-			{
-				str[i] = '\0';
-				++i;
-			}
-			return (i);
+			str[i + 1] = '\0';
+			return (i + 2);
 		}
 		++i;
 	}

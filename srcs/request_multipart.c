@@ -2,130 +2,119 @@
 
 #define CACHE_FILENAME "./cache.tmp"
 
-// static uint32_t		header_next(uint8_t *str)
-// {
-// 	uint32_t		i;
+static char		*locate(const char *content, size_t size, const char *needle)
+{
+	size_t	i;
+	size_t	j;
 
-// 	i = 0;
-// 	while (str[i])
-// 	{
-// 		if (str[i] == '\r' && str[i + 1] == '\n')
-// 		{
-// 			str[i] = '\0';
-// 			str[i + 1] = '\0';
-// 			return (i + 2);
-// 		}
-// 		++i;
-// 	}
-// 	return (0);
-// }
+	i = 0;
+	while (i < size)
+	{
+		if (content[i] == needle[0])
+		{
+			j = 0;
+			while ((i + j) < size && content[i + j] == needle[j])
+				++j;
+			if (needle[j] == '\0')
+				return ((char *)(content + i));
+		}
+		++i;
+	}
+	return (NULL);
+}
 
-// static int		get_element(char **str, char *search)
-// {
-// 	int		i;
-// 	char	*element;
-// 	char	*name;
+static int		get_element(char **str, char *search, char **key)
+{
+	int		i;
+	char	*element;
 
-// 	if ((element = strstr((const char *)*str, search)) == NULL)
-// 		return (0);
-// 	element = element + strlen(search);
-// 	if (*element == '\"')
-// 		++element;
-// 	i = 0;
-// 	while (element[i] && element[i] != '\"')
-// 		++i;
-// 	name = strndup(element, i);
-// 	printf("NAME: |%s|\n", name);
-// 	free(name);
-// 	if (element[i] == '\"')
-// 		++i;
-// 	*str = element + i;
-// 	return (1);
-// }
+	if ((element = strstr((const char *)*str, search)) == NULL)
+		return (0);
+	element = element + strlen(search);
+	if (*element == '\"')
+		++element;
+	i = 0;
+	while (element[i] && element[i] != '\"')
+		++i;
+	*key = strndup(element, i);
+	if (element[i] == '\"')
+		++i;
+	*str = element + i;
+	return (1);
+}
 
-// static int		parse_boundary(uint8_t *buff)
-// {
-// 	char		*str;
+static int		parse_boundary(t_http *data, uint8_t *buff, size_t size)
+{
+	char		*str;
+	char		*key;
+	char		*value;
+	uint8_t		*content;
 
-// 	str = (char *)buff;
-// 	if (get_element(&str, "name=") == 0)
-// 		return (0);
-// 	if (*str == '\0')
-// 		return (2);
-// 	if (get_element(&str, "filename=") == 0)
-// 		return (0);
-// 	return (3);
-// }
+	str = (char *)buff;
+	if ((content = (uint8_t *)locate((const char *)buff, size, "\r\n\r\n")) == NULL)
+		return (0);
+	memset(content, 0, sizeof(uint8_t) * 4);
+	content = content + 4;
+	if (get_element(&str, "name=", &key) == 0)
+		return (0);
+	if (*str == '\0')
+	{
+		value = strndup((char *)content, (size - (content - buff)));
+		if (contentAdd(data, key, value, 0) == 0)
+			return (0);
+		return (2);
+	}
+	if (get_element(&str, "filename=", &value) == 0)
+		return (0);
+	if (contentAdd(data, key, value, 1) == 0)
+		return (0);
+	int		fd;
 
-// static int		read_file(int fd, char *boundary, size_t len_boundary)
-// {
-// 	size_t		size;
-// 	uint8_t		buff[PAGE_SIZE];
-// 	uint8_t		*line;
+	if ((fd = open(value, O_WRONLY | O_CREAT | O_TRUNC, 0660)) == -1)
+		return (0);
+	write(fd, content, (size - (content - buff)));
+	close(fd);
+	return (3);
+}
 
-// 	int fd_new = open("file.copy", O_RDWR | O_CREAT | O_TRUNC, 0660);
+static int		isBoundaryEnd(char *ptr)
+{
+	if (ptr[0] == '-' && ptr[1] == '-')
+		return (1);
+	return (0);
+}
 
-// 	memset(buff, 0, PAGE_SIZE);
-// 	while ((size = read(fd, buff, PAGE_SIZE - 1)) > 0)
-// 	{
-// 		if ((line = (uint8_t *)strstr((const char *)buff, boundary)) != NULL)
-// 		{
-// 			write(fd_new, buff, (line - buff) - 2);
-// 			line = line + len_boundary;
-// 			break ;
-// 		}
-// 		else
-// 			write(fd_new, buff, size);
-// 	}
-// 	close(fd_new);
-// 	printf("DONE\n");
-// 	if (line[0] == '-' && line[1] == '-')
-// 		return (1);
-// 	return (1);
-// }
+static int		get_line(t_http *data, const uint8_t *ptr, size_t size)
+{
+	size_t		len;
+	uint8_t		*start;
+	uint8_t		*end;
 
-// static int		get_line(int fd, t_http *data)
-// {
-// 	size_t		size;
-// 	size_t		len_boundary;
-// 	uint8_t		buff[PAGE_SIZE];
-// 	uint8_t		*line;
-
-// 	len_boundary = strlen(data->boundary);
-// 	memset(buff, 0, PAGE_SIZE);
-// 	while ((size = read(fd, buff, PAGE_SIZE - 1)) > 0)
-// 	{
-// 		if ((line = (uint8_t *)strstr((const char *)buff, "\r\n")) != NULL)
-// 		{
-// 			if (strncmp((const char *)buff, data->boundary, len_boundary) == 0)
-// 			{
-// 				line = line + 2;
-// 				uint32_t i = header_next(line);
-// 				int ret = parse_boundary(line);
-// 				line = line + i;
-// 				while (strncmp((const char *)line, "\r\n", 2) != 0)
-// 					line = line + header_next(line);
-// 				line = line + 2;
-// 				lseek(fd, line - buff, SEEK_SET);
-// 				if (ret == 3)
-// 					read_file(fd, data->boundary, len_boundary);
-// 			}
-// 		}
-// 	}
-// 	return (1);
-// }
+	end = (uint8_t *)ptr;
+	len = strlen(data->boundary);
+	while ((start = (uint8_t *)locate((const char *)end, size, data->boundary)) != NULL)
+	{
+		if (isBoundaryEnd((char *)start + len) == 1)
+			return (1);
+		if ((end = (uint8_t *)locate((const char *)start + len, size, data->boundary)) == NULL)
+			return (0);
+		memset(end - 2, 0, sizeof(uint8_t) * 2);
+		parse_boundary(data, start, ((end - 2) - start));
+	}
+	return (1);
+}
 
 static int		request_process(int fd, t_http *data)
 {
-	const void	*mapped;
-	char		*ptr;
-	size_t		size;
+	const void		*mapped;
+	const uint8_t	*ptr;
+	size_t			size;
 
 	size = data->content_length;
-	if ((mapped = mmap (0, size, PROT_READ, MAP_PRIVATE, fd, 0)) == MAP_FAILED)
+	if ((mapped = mmap (0, size, PROT_READ | PROT_WRITE, MAP_PRIVATE, fd, 0)) == MAP_FAILED)
 		return (-1);
-	ptr = (char *)mapped;
-	// write(1, mapped, size);
+	ptr = (uint8_t *)mapped;
+	get_line(data, ptr, size);
 	return (1);
 }
 
@@ -146,11 +135,9 @@ int				request_multipart(int fd, t_http *data, uint8_t *str, ssize_t size)
 			break ;
 		write(fd_out, buff, size);
 	}
-	// lseek(fd_out, 0, SEEK_SET);
-	// get_line(fd_out, data);
 	request_process(fd_out, data);
 	close(fd_out);
-	// remove(CACHE_FILENAME);
+	remove(CACHE_FILENAME);
 	if (total != data->content_length)
 		return (response_error(fd, data, BAD_REQUEST));
 	return (ACCEPTED);

@@ -59,6 +59,7 @@ int					receive(int fd, int *status);
 
 int					request_multipart(int fd, t_http *data, uint8_t *str, ssize_t size);
 
+int					contentAdd(t_http *data, char *key, char *value, uint8_t flag);
 void				contentFree(t_content *node);
 int					contentParse(t_http *data, char *content);
 

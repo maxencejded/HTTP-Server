@@ -22,7 +22,7 @@ void					contentFree(t_content *node)
 	free(node);
 }
 
-static int				contentAdd(t_http *data, char *key, char *value, uint8_t flag)
+int						contentAdd(t_http *data, char *key, char *value, uint8_t flag)
 {
 	t_content	*node;
 
@@ -55,7 +55,7 @@ static int				contentSplit(t_http *data, char *content)
 	i = 0;
 	while (content[i])
 		++i;
-	if ((value = strndup(content, i)) == NULL)
+	if (i == 0 || (value = strndup(content, i)) == NULL)
 		return (0);
 	if (contentAdd(data, key, value, 0) == 0)
 		return (0);
