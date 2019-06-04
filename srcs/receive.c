@@ -5,32 +5,32 @@
 ** If successful, return OK. Otherwise, an appropriate code error is returned.
 */
 
-static int		request_data(int fd, t_http *data, uint8_t *str, ssize_t size)
+static int		request_data(int fd, t_http *data, char *str, ssize_t size)
 {
-	uint8_t		buff[PAGE_SIZE];
-	uint8_t		*content;
-	ssize_t		total;
+	char		buf[PAGE_SIZE];
+	char		*content;
+	char		*tmp;
+	size_t		total;
 
 	total = size;
-	data->content = (uint8_t *)malloc(sizeof(uint8_t) * data->content_length);
-	if (data->content == NULL)
+	if ((content = (char *)malloc(sizeof(char) * (data->content_length + 1))) == NULL)
 		return (response_error(fd, data, INTERNAL_SERVER_ERROR));
-	memset(data->content, 0, sizeof(uint8_t) * data->content_length);
-	memcpy(data->content, str, size);
-	content = data->content + size;
-	if (total < data->content_length)
+	memset(content, 0, sizeof(char) * (data->content_length + 1));
+	(size != 0) ? memcpy(content, str, size) : NULL;
+	tmp = content + size;
+	while (total < data->content_length && (size = recv(fd, buf, PAGE_SIZE, 0)) > 0)
 	{
-		while ((size = recv(fd, buff, PAGE_SIZE, 0)) > 0)
-		{
-			total += size;
-			if (total > data->content_length)
-				break ;
-			memcpy(content, buff, size);
-			content = content + size;
-		}
+		total += size;
+		memcpy(tmp, buf, size);
+		tmp = tmp + size;
 	}
 	if (total != data->content_length)
+	{
+		free(content);
 		return (response_error(fd, data, BAD_REQUEST));
+	}
+	if (contentParse(data, content) == 0)
+		return (response_error(fd, data, INTERNAL_SERVER_ERROR));
 	return (ACCEPTED);
 }
 
@@ -111,7 +111,7 @@ int				receive(int fd, int *status)
 		if (data->boundary)
 			*status = request_multipart(fd, data, end, size - (end - buf));
 		else
-			*status = request_data(fd, data, end, size - (end - buf));
+			*status = request_data(fd, data, (char *)end, size - (end - buf));
 		if (*status != ACCEPTED)
 		{
 			free(buf);

@@ -2,6 +2,7 @@
 # define HTTP_H
 
 # include <fcntl.h>
+# include <inttypes.h>
 # include <netdb.h>
 # include <signal.h>
 # include <stdio.h>
@@ -10,9 +11,12 @@
 # include <string.h>
 # include <unistd.h>
 # include <arpa/inet.h>
+# include <sys/mman.h>
 # include <sys/socket.h>
 # include <sys/stat.h>
 # include <sys/wait.h>
+
+# include "queue.h"
 
 /*
 ** HTTP Server configuration
@@ -34,9 +38,16 @@ typedef struct		s_http
 	uint8_t			content_type;
 	char			*boundary;
 
-	uint32_t		content_length;
-	uint8_t			*content;
+	size_t			content_length;
+	t_queue			*content;
 }					t_http;
+
+typedef struct		s_content
+{
+	char			*key;
+	char			*value;
+	uint8_t			flag;
+}					t_content;
 
 extern int			g_fd;
 
@@ -47,6 +58,9 @@ int					socket_accept(int fd, char **address);
 int					receive(int fd, int *status);
 
 int					request_multipart(int fd, t_http *data, uint8_t *str, ssize_t size);
+
+void				contentFree(t_content *node);
+int					contentParse(t_http *data, char *content);
 
 void				exit_server(void);
 void				sigstop(int sig);

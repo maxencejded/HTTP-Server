@@ -4,15 +4,20 @@ SERVER			= server
 CFLAGS			= -Wall -Wextra -Werror -g
 INCLUDES		= -I includes
 
-BASE			= server.c socket.c receive.c signal.c
+BASE			= server.c socket.c receive.c signal.c content.c
 DATA			= request_multipart.c
 REQUEST			= request.c method.c
+
 FIELD			= field_accept.c field_content_length.c field_content_type.c\
 					field_expect.c field_host.c
 FIELDS			= fields.c $(FIELD)
+
 RESPONSE		= response.c protocol.c content_type.c ft_free.c\
 					response_error.c response_success.c
-LIBFT			= strdel.c concat.c get_file_content.c
+
+QUEUE			= queueInit.c nodeInit.c queueFree.c dequeue.c enqueue.c\
+					isEmpty.c peek.c
+LIBFT			= strdel.c concat.c get_file_content.c $(addprefix queue/, $(QUEUE))
 API				= demo.c
 
 REQUEST_FCT		= $(addprefix request/, $(REQUEST) $(FIELDS))

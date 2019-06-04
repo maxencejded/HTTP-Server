@@ -10,17 +10,25 @@
 # define PROTOCOL_1_1	2
 # define PROTOCOL_2_0	3
 
+#define METHOD_NUMBER 	4
+
 # define METHOD_GET		1
 # define METHOD_HEAD	2
 # define METHOD_POST	3
 # define METHOD_PUT		4
 
-typedef struct		s_method
+# define POST_NUMBER	3
+# define POST_TYPE_1	1
+# define POST_TYPE_2	2
+# define POST_TYPE_3	3
+
+
+typedef struct		s_lookup
 {
-	char			*method;
+	char			*name;
 	uint8_t			length;
 	uint8_t			number;
-}					t_method;
+}					t_lookup;
 
 int					http_free(t_http *data);
 
@@ -42,16 +50,5 @@ int					field_content_length(char *str, t_http *data);
 int					field_content_type(char *str, t_http *data);
 int					field_expect(char *str, t_http *data);
 int					field_host(char *str, t_http *data);
-
-typedef struct		s_content_type
-{
-	char			*name;
-	uint8_t			code;
-}					t_content_type;
-
-# define POST_CONTENT_NUM	3
-# define POST_TYPE_1		1
-# define POST_TYPE_2		2
-# define POST_TYPE_3		3
 
 #endif

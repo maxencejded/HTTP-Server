@@ -36,12 +36,10 @@ static uint8_t		method_path(char *method, t_http *data)
 	return (1);
 }
 
-#define METHOD_NUMBER 4
-
 uint8_t				method(char *method, t_http *data)
 {
 	uint8_t			i;
-	static t_method	m[METHOD_NUMBER] = {
+	static t_lookup	m[METHOD_NUMBER] = {
 		{"GET", 3, METHOD_GET},
 		{"HEAD", 4, METHOD_HEAD},
 		{"POST", 4, METHOD_POST},
@@ -51,7 +49,7 @@ uint8_t				method(char *method, t_http *data)
 	i = 0;
 	while (i < METHOD_NUMBER)
 	{
-		if (strncmp(method, m[i].method, m[i].length) == 0)
+		if (strncmp(method, m[i].name, m[i].length) == 0)
 		{
 			data->method = m[i].number;
 			method_path(method, data);

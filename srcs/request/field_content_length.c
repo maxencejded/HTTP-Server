@@ -2,9 +2,9 @@
 
 int				field_content_length(char *str, t_http *data)
 {
-	uint32_t	len;
+	size_t		len;
 
-	len = strtol(str, &str, 10);
+	len = strtoimax(str, &str, 10);
 	if (*str != '\0')
 		return (0);
 	data->content_length = len;

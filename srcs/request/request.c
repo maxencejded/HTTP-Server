@@ -10,6 +10,23 @@ static t_http		*http_init(void)
 	return (data);
 }
 
+static void			queueContentFree(t_queue *queue)
+{
+	t_node		*tmp;
+
+	if (queue == NULL)
+		return ;
+	tmp = NULL;
+	while (queue->first)
+	{
+		tmp = queue->first;
+		queue->first = queue->first->next;
+		contentFree(tmp->elem);
+		free(tmp);
+	}
+	free(queue);
+}
+
 int					http_free(t_http *data)
 {
 	if (data == NULL)
@@ -17,7 +34,7 @@ int					http_free(t_http *data)
 	free(data->path);
 	free(data->accept);
 	free(data->boundary);
-	free(data->content);
+	queueContentFree(data->content);
 	free(data);
 	return (1);
 }
