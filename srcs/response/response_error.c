@@ -46,11 +46,11 @@ int					end_connection_error(t_http *request, int reponse, int fd,
 	answer->reponse = reponse;
 	answer->protocol = (request == NULL) ? 1 : request->protocol;
 	answer->fd = fd;
-	sprintf(str, "%d", reponse);
 	if ((((answer->complete_path = concat(ERROR_FOLDER_PATH, str)) == NULL)
 				|| ((answer->complete_path = concat(answer->complete_path,
-							".html")) == NULL)) && http_free(request) == 1)
-		return (write_connection_error(answer));
+							".html")) == NULL)) && reponse_free(answer) == 0)
+		return (response_error(fd, request, reponse));
+	sprintf(str, "%d", reponse);
 	if ((((answer->file_fd = open(answer->complete_path, O_RDONLY)) < 0) ||
 				((get_file_content(&answer->file_size, answer->complete_path))
 				< 0)) && http_free(request) == 1)
@@ -78,7 +78,7 @@ int					response_error(int fd, t_http *request, int reponse)
 
 	if (reponse == INTERNAL_SERVER_ERROR || (answer = reponse_init()) == NULL)
 	{
-		dprintf(fd, "HTTP/1.0 500 Internal Server Error\r\n\r\n");
+		write(fd, "HTTP/1.0 500 Internal Server Error\r\n\r\n", 37);
 		close(fd);
 		return (INTERNAL_SERVER_ERROR);
 	}
