@@ -57,41 +57,29 @@ t_reponse			*reponse_init(void)
 
 t_status			g_status[STATUS_COUNT] = {
 
-	{200, "Ok"},
-	{201, "Created"},
-	{202, "Accepted"},
-	{204, "No-content"},
-	{206, "Partial content"},
+	{OK, "OK"},
+	{CREATED, "Created"},
+	{ACCEPTED, "Accepted"},
+	{NO_CONTENT, "No Content"},
+	{PARTIAL_CONTENT, "Partial Content"},
 
-/*
-** Error messages for error 300
-*/
+	{MULTIPLE_CHOICES, "Multiple Choices"},
+	{MOVED_PERMANENTLY, "Moved Permanently"},
+	{FOUND, "Found"},
+	{PERMANENT_REDIRECT, "Permanent redirected (experimental)"},
 
-	{300, "Multiple choices"},
-	{301, "Moved permanently"},
-	{302, "Found"},
-	{308, "Permanently redirected"},
+	{BAD_REQUEST, "Bad Request"},
+	{UNAUTHORIZED, "Unauthorized"},
+	{FORBIDDEN, "Forbidden"},
+	{NOT_FOUND, "Not Found"},
+	{METHOD_NOT_ALLOWED, "Method Not Allowed"},
+	{REQUEST_TIME_OUT, "Request Timeout"},
+	{ENTITY_TOO_LARGE, "Request Entity Too Large"},
 
-/*
-** Error messages for error 400
-*/
-
-	{400, "Bad request"},
-	{401, "Unauthorized"},
-	{403, "Forbidden"},
-	{404, "Not found"},
-	{405, "Method not allowed"},
-	{408, "Request timed out"},
-	{413, "Entity too large"},
-
-/*
-** Error messages for error 500
-*/
-
-	{500, "Internal server error"},
-	{501, "Not implemented"},
-	{502, "Bad gateway"},
-	{503, "Service unavailable"},
+	{INTERNAL_SERVER_ERROR, "Internal Server Error"},
+	{NOT_IMPLEMENTED, "Not Implemented"},
+	{BAD_GATEWAY, "Bad Gateway"},
+	{SERVICE_UNAVAILABLE, "Service Unavailable"},
 
 };
 
