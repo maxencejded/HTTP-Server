@@ -97,14 +97,13 @@ t_status			g_status[STATUS_COUNT] = {
 
 char				*get_reponse_message(int reponse)
 {
-	if (reponse < 300)
-		return ("Success connecting");
-	else if (reponse < 400)
-		return ("Redirection");
-	else if (reponse < 500)
-		return ("Request Error");
-	else
-		return ("Server Error");
+	int				i;
+
+	i = -1;
+	while (++i <= SERVICE_UNAVAILABLE)
+		if (g_status[i].code == reponse)
+			return (g_status[i].name);
+	return ("Unhandled error");
 }
 
 /*
@@ -137,7 +136,10 @@ static int			start_api_response(t_http *request, t_reponse *answer)
 	while (++i < API_COUNT)
 		if (strcmp(&concatted[n], g_api[i].name) == 0)
 			answer->reponse = g_api[i].fct(request, answer);
-	return (answer->reponse);
+	i = answer->reponse;
+	ft_free(concatted);
+	http_free(request) ? reponse_free(answer) : reponse_free(answer);
+	return (i);
 }
 
 /*
