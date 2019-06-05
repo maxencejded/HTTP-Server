@@ -32,8 +32,7 @@ int					http_free(t_http *data);
 
 t_http				*header(int fd, char *request, int *status);
 uint8_t				method(char *method, t_http *data);
-int					post_request(int fd, t_http *data,
-						uint8_t *ptr, size_t size);
+int					post_request(t_http *data, uint8_t *ptr, size_t size);
 
 int					parse_multipart(t_http *data,
 						const uint8_t *ptr, size_t size);

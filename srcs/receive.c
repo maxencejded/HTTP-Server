@@ -74,7 +74,7 @@ int				receive(int fd, int *status)
 	if (data && data->method == METHOD_POST && data->content_length)
 	{
 		size = size - (end - buf);
-		*status = post_request(fd, data, end, size);
+		*status = post_request(data, end, size);
 		if (*status != ACCEPTED)
 		{
 			free(buf);
