@@ -30,6 +30,7 @@
 
 typedef struct		s_http
 {
+	int				fd;
 	uint8_t			method;
 	char			*path;
 	uint8_t			protocol;

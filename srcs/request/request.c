@@ -31,27 +31,28 @@ static uint32_t		header_next(char *str)
 t_http				*header(int fd, char *request, int *status)
 {
 	uint32_t	index;
-	t_http		*header;
+	t_http		*data;
 
 	if (request == NULL)
 		return (NULL);
-	if ((header = http_init()) == NULL)
+	if ((data = http_init()) == NULL)
 	{
 		*status = response_error(fd, NULL, INTERNAL_SERVER_ERROR);
 		return (NULL);
 	}
+	data->fd = fd;
 	index = header_next(request);
-	if (method(request, header) == 0)
+	if (method(request, data) == 0)
 	{
-		*status = response_error(fd, header, NOT_IMPLEMENTED);
+		*status = response_error(fd, data, NOT_IMPLEMENTED);
 		return (NULL);
 	}
 	request = request + index;
 	while (*request)
 	{
 		index = header_next(request);
-		fields_dispatch(request, header);
+		fields_dispatch(request, data);
 		request = request + index;
 	}
-	return (header);
+	return (data);
 }
