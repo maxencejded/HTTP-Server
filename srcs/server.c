@@ -16,7 +16,8 @@ static int		connection_add(int fd, char *address, uint16_t connect)
 	{
 		printf("[%d] At Address: %s\n", connect, address);
 		receive(fd, &response);
-		printf("[%d] Close with status: %d - %s\n", connect, response, get_reponse_message(response));
+		printf("[%d] Close with status: %d - %s\n", connect, response,
+			get_reponse_message(response));
 		_exit(close(fd));
 	}
 	close(fd);
@@ -43,8 +44,7 @@ static int		loop(void)
 
 	connect = 0;
 	address = NULL;
-	// while ((fd = socket_accept(g_fd, &address)) > 0)
-	if ((fd = socket_accept(g_fd, &address)) > 0)
+	while ((fd = socket_accept(g_fd, &address)) > 0)
 	{
 		if (connection_add(fd, address, connect) == 0)
 			return (0);

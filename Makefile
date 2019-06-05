@@ -14,8 +14,8 @@ FIELDS			= fields.c $(FIELD)
 RESPONSE		= response.c protocol.c content_type.c ft_free.c\
 					response_error.c response_success.c
 
-QUEUE			= queueInit.c nodeInit.c queueFree.c dequeue.c enqueue.c\
-					isEmpty.c peek.c
+QUEUE			= queue_init.c node_init.c dequeue.c enqueue.c\
+					is_empty.c peek.c
 LIBFT			= strdel.c concat.c get_file_content.c $(addprefix queue/, $(QUEUE))
 API				= demo.c
 

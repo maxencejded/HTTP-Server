@@ -1,6 +1,6 @@
 #include "queue.h"
 
-t_node			*nodeInit(void *elem)
+t_node			*node_init(void *elem)
 {
 	t_node		*node;
 

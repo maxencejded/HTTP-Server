@@ -5,7 +5,7 @@ void				*dequeue(t_queue *queue)
 	void			*elem;
 	t_node			*node;
 
-	if (isEmpty(queue) == 1)
+	if (is_empty(queue) == 1)
 		return (NULL);
 	node = queue->first;
 	queue->first = node->next;

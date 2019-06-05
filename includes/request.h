@@ -10,8 +10,7 @@
 # define PROTOCOL_1_1	2
 # define PROTOCOL_2_0	3
 
-#define METHOD_NUMBER 	4
-
+# define METHOD_NUMBER 	4
 # define METHOD_GET		1
 # define METHOD_HEAD	2
 # define METHOD_POST	3
@@ -21,7 +20,6 @@
 # define POST_TYPE_1	1
 # define POST_TYPE_2	2
 # define POST_TYPE_3	3
-
 
 typedef struct		s_lookup
 {
@@ -34,10 +32,13 @@ int					http_free(t_http *data);
 
 t_http				*header(int fd, char *request, int *status);
 uint8_t				method(char *method, t_http *data);
-int					post_request(int fd, t_http *data, uint8_t *ptr, size_t size);
+int					post_request(int fd, t_http *data,
+						uint8_t *ptr, size_t size);
 
-int					parse_multipart(t_http *data, const uint8_t *ptr, size_t size);
-int					content_add(t_http *data, char *key, char *value, uint8_t flag);
+int					parse_multipart(t_http *data,
+						const uint8_t *ptr, size_t size);
+int					content_add(t_http *data, char *key,
+						char *value, uint8_t flag);
 t_content			*content_init(char *key, char *value, uint8_t flag);
 void				content_free(t_content *node);
 int					content_parse(t_http *data, char *content);
@@ -48,7 +49,7 @@ typedef struct		s_fields
 	int				(*fct) (char *str, t_http *data);
 }					t_fields;
 
-#define FIELDS_SIZE		5
+# define FIELDS_SIZE		5
 
 uint8_t				fields_dispatch(char *str, t_http *data);
 

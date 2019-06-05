@@ -1,6 +1,6 @@
 #include "queue.h"
 
-t_queue			*queueInit(void)
+t_queue			*queue_init(void)
 {
 	t_queue		*queue;
 

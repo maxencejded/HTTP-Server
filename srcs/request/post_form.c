@@ -34,7 +34,7 @@ int			content_add(t_http *data, char *key, char *value, uint8_t flag)
 	if (data == NULL)
 		return (0);
 	if (data->content == NULL)
-		data->content = queueInit();
+		data->content = queue_init();
 	if ((node = content_init(key, value, flag)) == NULL)
 		return (0);
 	if (enqueue(data->content, node) == 0)

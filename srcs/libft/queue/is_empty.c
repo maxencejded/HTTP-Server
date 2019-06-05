@@ -1,6 +1,6 @@
 #include "queue.h"
 
-int				isEmpty(t_queue *queue)
+int				is_empty(t_queue *queue)
 {
 	if (queue == NULL || queue->first == NULL)
 		return (1);
