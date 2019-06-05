@@ -57,7 +57,7 @@ static void			queue_content_free(t_queue *queue)
 ** Free the content
 */
 
-void		content_free(t_content *node)
+void				content_free(t_content *node)
 {
 	if (node == NULL)
 		return ;
