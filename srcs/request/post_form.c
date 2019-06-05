@@ -13,15 +13,6 @@ t_content	*content_init(char *key, char *value, uint8_t flag)
 	return (node);
 }
 
-void		content_free(t_content *node)
-{
-	if (node == NULL)
-		return ;
-	free(node->key);
-	free(node->value);
-	free(node);
-}
-
 /*
 ** Add the key and the value into the queue
 ** If successful, return 1. Otherwise, a 0 is returned to indicate an error.
