@@ -104,28 +104,23 @@ t_api				g_api[API_COUNT] = {
 
 static int			start_api_response(t_http *request, t_reponse *answer)
 {
-	char			*concatted;
-	char			*complete_path;
-	struct stat		sb;
 	int				n;
 	int				i;
+	int				fd;
 
-	concatted = concat(API_FOLDER_PATH, request->path);
-	complete_path = concat(concatted, ".c");
-	if ((!concatted || !complete_path || stat(complete_path, &sb) == -1)
-			&& ft_free(complete_path) == 0 && ft_free(concatted) == 0)
-		return (end_connection_error(request, IER, answer->fd, answer));
-	ft_free(complete_path);
-	n = strlen(concatted);
-	while (n > 0 && concatted[n] != '/')
+	i = -1;
+	fd = answer->fd;
+	n = strlen(request->path);
+	while (n > 0 && request->path[n] != '/')
 		--n;
 	n += 1;
-	i = -1;
 	while (++i < API_COUNT)
-		if (strcmp(&concatted[n], g_api[i].name) == 0)
-			answer->reponse = g_api[i].fct(request, answer);
+		if (strcmp(&request->path[n], g_api[i].name) == 0
+				&& (answer->reponse = g_api[i].fct(request, answer)))
+			break ;
+	if (i >= API_COUNT && reponse_free(answer) == 0)
+		return (response_error(fd, request, NOT_FOUND));
 	i = answer->reponse;
-	ft_free(concatted);
 	http_free(request) ? reponse_free(answer) : reponse_free(answer);
 	return (i);
 }

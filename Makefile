@@ -10,7 +10,6 @@ REQUEST			= request.c method.c post_content.c post_form.c post_multipart.c
 FIELD			= field_accept.c field_content_length.c field_content_type.c\
 					field_expect.c field_host.c
 FIELDS			= fields.c $(FIELD)
-
 RESPONSE		= response.c protocol.c content_type.c ft_free.c\
 					response_error.c response_success.c
 
