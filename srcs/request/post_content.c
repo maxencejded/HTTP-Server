@@ -1,48 +1,51 @@
 #include "server.h"
 
 /*
-** Create a pointer to the CACHE_FILE then parse the content
+** Create a pointer to cache the content form the request
 ** If successful, return 1. Otherwise, a 0 is returned to indicate an error.
 */
 
-static int		request_process(int fd, t_http *data)
+static int		request_memory(size_t size, void **mapped, uint8_t **tmp)
 {
-	size_t			size;
-	const void		*mapped;
-
-	size = data->content_length;
-	mapped = mmap(0, size, PROT_READ | PROT_WRITE, MAP_PRIVATE, fd, 0);
+	*mapped = mmap(0, size,
+				PROT_READ | PROT_WRITE,
+				MAP_ANON | MAP_PRIVATE,
+				-1, 0);
 	if (mapped == MAP_FAILED)
 		return (0);
-	return (parse_multipart(data, (const uint8_t *)mapped, size));
+	*tmp = (uint8_t *)(*mapped);
+	return (1);
 }
 
 /*
-** Copy the content receive into a CACHE_FILE then parse the content
+** Copy the content receive into a cache pointer
 ** If successful, return OK. Otherwise, an appropriate code error is returned.
 */
 
 static int		post_multipart(int fd, t_http *data, uint8_t *str, size_t size)
 {
-	int			cache;
 	size_t		total;
 	size_t		length;
 	uint8_t		buff[PAGE_SIZE];
-
+	uint8_t		*tmp;
+	void		*mapped;
+	
 	total = size;
 	length = data->content_length;
-	if ((cache = open(CACHE_FILE, O_RDWR | O_CREAT | O_TRUNC, 0)) == -1)
-		return (INTERNAL_SERVER_ERROR);
-	(size) ? write(cache, str, size) : 0;
+	if (request_memory(length, &mapped, &tmp) == 0)
+		return (response_error(fd, data, INTERNAL_SERVER_ERROR));
+	(size) ? memcpy(tmp, str, size) : 0;
+	tmp = (size) ? tmp + size : tmp;
 	while (total < length && (size = recv(fd, buff, PAGE_SIZE, 0)) > 0)
 	{
 		total += size;
-		write(cache, buff, size);
+		memcpy(tmp, buff, size);
+		tmp = tmp + size;
 	}
 	if (total == length)
-		request_process(cache, data);
-	close(cache);
-	remove(CACHE_FILE);
+		if (parse_multipart(data, (const uint8_t *)mapped, length) == 0)
+			total = 0;
+	munmap(mapped, length);
 	if (total != length)
 		return (response_error(fd, data, INTERNAL_SERVER_ERROR));
 	return (ACCEPTED);

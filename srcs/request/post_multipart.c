@@ -64,7 +64,11 @@ static int		parse_file(char *file, uint8_t *content, ssize_t size)
 	if ((fd = open(file, O_WRONLY | O_CREAT | O_TRUNC, 0660)) == -1)
 		return (0);
 	if (write(fd, content, size) != size)
+	{
+		close(fd);
+		remove(file);
 		return (0);
+	}
 	close(fd);
 	return (1);
 }

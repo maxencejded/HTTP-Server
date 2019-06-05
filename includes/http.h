@@ -25,7 +25,6 @@
 # define PORT			6060
 # define CONNECTION		4
 # define TIME_OUT		10
-# define CACHE_FILE		"./cache.tmp"
 
 # define PAGE_SIZE		getpagesize()
 
