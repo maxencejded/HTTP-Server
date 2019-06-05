@@ -21,8 +21,9 @@ static void			write_connection_success(t_reponse *answer)
 		: 0;
 	answer->content_type ? dprintf(answer->fd, "Content-Type: %s\r\n",
 			answer->content_type) : 0;
-	answer->file_size ? dprintf(answer->fd, "Content-Length: %lu\r\n\r\n",
+	answer->file_size ? dprintf(answer->fd, "Content-Length: %lu\r\n",
 				(long unsigned int)answer->file_size) : 0;
+	dprintf(answer->fd, "\r\n");	
 	while ((size = read(answer->file_fd, buff, PAGE_SIZE)) > 0)
 		write(answer->fd, buff, size);
 }
