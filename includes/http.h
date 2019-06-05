@@ -25,6 +25,7 @@
 # define PORT			6060
 # define CONNECTION		4
 # define TIME_OUT		10
+# define CACHE_FILE		"./cache.tmp"
 
 # define PAGE_SIZE		getpagesize()
 
@@ -56,12 +57,6 @@ int					socket_bind(int fd, int port, char **address);
 int					socket_accept(int fd, char **address);
 
 int					receive(int fd, int *status);
-
-int					request_multipart(int fd, t_http *data, uint8_t *str, ssize_t size);
-
-int					contentAdd(t_http *data, char *key, char *value, uint8_t flag);
-void				contentFree(t_content *node);
-int					contentParse(t_http *data, char *content);
 
 void				exit_server(void);
 void				sigstop(int sig);

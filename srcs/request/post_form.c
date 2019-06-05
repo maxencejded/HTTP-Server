@@ -1,6 +1,6 @@
 #include "server.h"
 
-static t_content		*contentInit(char *key, char *value, uint8_t flag)
+t_content	*content_init(char *key, char *value, uint8_t flag)
 {
 	t_content	*node;
 
@@ -13,7 +13,7 @@ static t_content		*contentInit(char *key, char *value, uint8_t flag)
 	return (node);
 }
 
-void					contentFree(t_content *node)
+void		content_free(t_content *node)
 {
 	if (node == NULL)
 		return ;
@@ -22,7 +22,12 @@ void					contentFree(t_content *node)
 	free(node);
 }
 
-int						contentAdd(t_http *data, char *key, char *value, uint8_t flag)
+/*
+** Add the key and the value into the queue
+** If successful, return 1. Otherwise, a 0 is returned to indicate an error.
+*/
+
+int			content_add(t_http *data, char *key, char *value, uint8_t flag)
 {
 	t_content	*node;
 
@@ -30,17 +35,22 @@ int						contentAdd(t_http *data, char *key, char *value, uint8_t flag)
 		return (0);
 	if (data->content == NULL)
 		data->content = queueInit();
-	if ((node = contentInit(key, value, flag)) == NULL)
+	if ((node = content_init(key, value, flag)) == NULL)
 		return (0);
 	if (enqueue(data->content, node) == 0)
 	{
-		contentFree(node);
+		content_free(node);
 		return (0);
 	}
 	return (1);
 }
 
-static int				contentSplit(t_http *data, char *content)
+/*
+** Split the data in two part: key and value
+** If successful, return 1. Otherwise, a 0 is returned to indicate an error.
+*/
+
+static int	content_split(t_http *data, char *content)
 {
 	char		*key;
 	char		*value;
@@ -55,14 +65,21 @@ static int				contentSplit(t_http *data, char *content)
 	i = 0;
 	while (content[i])
 		++i;
-	if (i == 0 || (value = strndup(content, i)) == NULL)
+	if (i == 0)
+		value = NULL;
+	else if ((value = strndup(content, i)) == NULL)
 		return (0);
-	if (contentAdd(data, key, value, 0) == 0)
+	if (content_add(data, key, value, 0) == 0)
 		return (0);
 	return (1);
 }
 
-int						contentParse(t_http *data, char *content)
+/*
+** Parse the data receive and add it to the queue
+** If successful, return 1. Otherwise, a 0 is returned to indicate an error.
+*/
+
+int			content_parse(t_http *data, char *content)
 {
 	int			ret;
 	char		*ptr;
@@ -73,12 +90,12 @@ int						contentParse(t_http *data, char *content)
 	while ((ptr = strchr(tmp, '&')) != NULL)
 	{
 		*ptr = '\0';
-		if ((ret = contentSplit(data, tmp)) == 0)
+		if ((ret = content_split(data, tmp)) == 0)
 			break ;
 		tmp = ptr + 1;
 	}
 	if (ret != 0 && *tmp != '\0')
-		ret = contentSplit(data, tmp);
+		ret = content_split(data, tmp);
 	free(content);
 	return (ret);
 }

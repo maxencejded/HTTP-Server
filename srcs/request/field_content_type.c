@@ -17,7 +17,6 @@ static int		boundary(char *str, t_http *data)
 
 int				field_content_type(char *str, t_http *data)
 {
-	int						ret;
 	int8_t					i;
 	static t_lookup			type[POST_NUMBER] = {
 		{"text/plain", 10, POST_TYPE_1},
@@ -25,9 +24,8 @@ int				field_content_type(char *str, t_http *data)
 		{"multipart/form-data", 19, POST_TYPE_3},
 	};
 
-	ret = 0;
 	if (data->method != METHOD_POST)
-		return (ret);
+		return (0);
 	while (*str && *str == ' ')
 		++str;
 	i = 0;
@@ -36,12 +34,11 @@ int				field_content_type(char *str, t_http *data)
 		if (strncmp(str, type[i].name, type[i].length) == 0)
 		{
 			data->content_type = type[i].number;
-			ret = 1;
 			if (type[i].number == POST_TYPE_3)
-				ret = boundary(str + type[i].length, data);
-			break ;
+				return (boundary(str + type[i].length, data));
+			return (1);
 		}
 		++i;
 	}
-	return (ret);
+	return (0);
 }
