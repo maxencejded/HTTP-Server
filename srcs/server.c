@@ -7,28 +7,25 @@
 
 static int		connection_add(int fd, char *address, uint16_t connect)
 {
-	int			response;
+	int			status;
 	pid_t		process;
+	t_http		*data;
 
-	response = 200;
+	data = NULL;
 	signal(SIGCHLD, sigchld);
 	if ((process = fork()) == 0)
 	{
-		printf("[%d] At Address: %s\n", connect, address);
-		receive(fd, &response);
-		printf("[%d] Close with status: %d - %s\n", connect, response,
-			get_reponse_message(response));
+		printf("[%d] %s\n", connect, address);
+		if (request(fd, &data, &status) == 1)
+			status = response(data, fd);
+		printf("[%d] %d %s\n", connect, status, get_reponse_message(status));
 		_exit(close(fd));
 	}
 	close(fd);
 	if (process < 0)
-	{
 		perror("ERROR: Fork");
-		strdel(&address);
-		return (0);
-	}
 	strdel(&address);
-	return (1);
+	return ((process < 0) ? 0 : 1);
 }
 
 /*

@@ -34,21 +34,18 @@ static ssize_t	request_read(int fd, uint8_t **data, uint8_t **end, int *status)
 		if (strstr((const char *)buff, "\r\n\r\n") == NULL)
 		{
 			*status = response_error(fd, NULL, ENTITY_TOO_LARGE);
-			return (-1);
+			return (0);
+		}
+		if (copy(buff, data, end, size) == 0)
+		{
+			*status = response_error(fd, NULL, INTERNAL_SERVER_ERROR);
+			return (0);
 		}
 	}
 	else if (size == 0)
-	{
 		*status = response_error(fd, NULL, NO_CONTENT);
-		return (0);
-	}
 	else
-	{
 		*status = response_error(fd, NULL, REQUEST_TIME_OUT);
-		return (-1);
-	}
-	if (copy(buff, data, end, size) == 0)
-		*status = response_error(fd, NULL, INTERNAL_SERVER_ERROR);
 	return (size);
 }
 
@@ -59,29 +56,23 @@ static ssize_t	request_read(int fd, uint8_t **data, uint8_t **end, int *status)
 ** DEBUG: write(1, buf, (end - buf));
 */
 
-int				receive(int fd, int *status)
+int				request(int fd, t_http **data, int *status)
 {
+	int			ret;
 	ssize_t		size;
 	uint8_t		*buf;
 	uint8_t		*end;
-	t_http		*data;
 
-	buf = NULL;
+	ret = 1;
 	if ((size = request_read(fd, &buf, &end, status)) <= 0)
 		return (0);
-	if ((data = header(fd, (char *)buf, status)) == NULL)
+	if ((*data = header(fd, (char *)buf, status)) == NULL)
 		return (0);
-	if (data && data->method == METHOD_POST && data->content_length)
+	if (data && (*data)->method == METHOD_POST && (*data)->content_length)
 	{
 		size = size - (end - buf);
-		*status = post_request(data, end, size);
-		if (*status != ACCEPTED)
-		{
-			free(buf);
-			return (0);
-		}
+		ret = content(*data, end, size, status);
 	}
 	free(buf);
-	*status = response(data, fd);
-	return (1);
+	return (ret);
 }

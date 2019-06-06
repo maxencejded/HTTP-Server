@@ -32,7 +32,8 @@ int					http_free(t_http *data);
 
 t_http				*header(int fd, char *request, int *status);
 uint8_t				method(char *method, t_http *data);
-int					post_request(t_http *data, uint8_t *ptr, size_t size);
+int					content(t_http *data, uint8_t *ptr,
+						size_t size, int *status);
 
 int					parse_multipart(t_http *data,
 						const uint8_t *ptr, size_t size);
@@ -48,7 +49,7 @@ typedef struct		s_fields
 	int				(*fct) (char *str, t_http *data);
 }					t_fields;
 
-# define FIELDS_SIZE		5
+# define FIELDS_COUNT	5
 
 uint8_t				fields_dispatch(char *str, t_http *data);
 
