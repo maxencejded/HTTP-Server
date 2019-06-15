@@ -15,10 +15,10 @@ static int		connection_add(int fd, char *address, uint16_t connect)
 	signal(SIGCHLD, sigchld);
 	if ((process = fork()) == 0)
 	{
-		printf("[%d] %s\n", connect, address);
+		printf("[%3d] %s\n", connect, address);
 		if (request(fd, &data, &status) == 1)
 			status = response(data, fd);
-		printf("[%d] %d %s\n", connect, status, get_reponse_message(status));
+		printf("[%3d] %d %s\n", connect, status, get_reponse_message(status));
 		_exit(close(fd));
 	}
 	close(fd);
