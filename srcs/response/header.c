@@ -1,11 +1,15 @@
 #include "server.h"
 #include "response.h"
 
-static char					*ft_itoa(long unsigned int nb)
+/*
+** Itoa function used on a long unsigned int
+*/
+
+static char				*ft_itoa(long unsigned int nb)
 {
-	long unsigned int		tmp;
-	long unsigned int		pow;
-	char					*str;
+	long unsigned int	tmp;
+	long unsigned int	pow;
+	char				*str;
 
 	tmp = nb;
 	pow = 1;
@@ -22,7 +26,12 @@ static char					*ft_itoa(long unsigned int nb)
 	return (str);
 }
 
-static int		ft_write(int fd, char *str, char *str2, char *str3)
+/*
+** Function used to remove any dprintf int he process of writing to the socket
+** fd the HTML Response Header
+*/
+
+static int				ft_write(int fd, char *str, char *str2, char *str3)
 {
 	write(fd, str, strlen(str));
 	write(fd, str2, strlen(str2));
@@ -30,9 +39,13 @@ static int		ft_write(int fd, char *str, char *str2, char *str3)
 	return (0);
 }
 
-void			print_header(t_reponse *answer)
+/*
+** Processing to print the Response HTML Header
+*/
+
+void					print_header(t_reponse *answer)
 {
-	char		*tmp;
+	char				*tmp;
 
 	answer->protocol ? ft_write(answer->fd, "HTTP/",
 			protocol_version(answer->protocol), " ") : 0;
