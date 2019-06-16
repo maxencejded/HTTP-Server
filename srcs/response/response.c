@@ -83,6 +83,10 @@ t_status			g_status[STATUS_COUNT] = {
 
 };
 
+/*
+** Find the good response message depending on the value sent and return it
+*/
+
 char				*get_reponse_message(int reponse)
 {
 	int				i;
@@ -96,11 +100,18 @@ char				*get_reponse_message(int reponse)
 
 /*
 ** Checking if the called URL is not present in the API folder
+** Add your APIS in this array and modify the API_COUNT in api include file
 */
 
 t_api				g_api[API_COUNT] = {
 	{"demo", &demo}
 };
+
+/*
+** For any API, prepare the response and launch the called API with the
+** header sent by the HTTP and a structure answer containing most of your
+** desired header
+*/
 
 static int			start_api_response(t_http *request, t_reponse *answer)
 {
