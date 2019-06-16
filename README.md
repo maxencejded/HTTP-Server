@@ -4,96 +4,61 @@ This project is a C HTTP Server in C.
 
 ## Getting Started
 
-The goal of this project is to provide a whole HTTP Server in C.
-
-### Prerequisites
-
-No library are required to launch this project. The server only uses C libraries.
+The goal of this project is to understand the HTTP protocol and his specificity by providing a whole Server in C using only the standard C libraries.
 
 ### Installing
 
 To create the server just go to the root of the folder and:
 
 ```bash
-Make
+$ git clone https://github.com/maxencejded/HTTP-Server.git server
+$ cd server
+$ make
+$ ./server
+Starting new Server
+Adrress: 0.0.0.0:6060
 ```
 
-If you want to add your website, you'll be expected to insert it in the site folder.
+If you want to add your website, you'll be expected to insert it in the `site` folder. The `index.html` should be at the root of the folder.
+
+### API
+If you are willing to add API's, you'll have to create them in the API folder:
 
 ```bash
-rm -rf site/*
-```
-Then just copy the content of your website in this folder with index.html at the root of the folder.
-
-If you are willing to add APIS, you'll have to create them in the API folder:
-
-```bash
-cd api/
+$ cd api/
 ```
 The demo file is an api to show you how you should format your content.
 Don't forget that you will have to print the HTTP header by yourself.
 Finally, you are expected to add the name in the API array. Don't forget to increase the size of the number of API_COUNT.
 
 ```bash
-vim includes/api.h
+$ vim includes/api.h
 ```
 ```C
-# define API_COUNT 1 (NUMBER OF APIS)
+# define API_COUNT 1 /* NUMBER OF APIs */
 
-int	demo(t_http *request, t_reponse *answer);
-# After this line you are expected to add your function calls there
+int        demo(t_http *request, t_reponse *answer);
+/* Add your functions here */
 ```
 
-Then
-
-```bash
-vim srcs/response/response.c
-```
-```C
-t_api				g_api[API_COUNT] = {
-	{"demo", &demo}
-  # Add your name of function there
-};
-```
-
-## Running the tests
+## Running Test
 
 Tests will be available soon. They are being written.
 
-### Break down into end to end tests
-
-Will be soon released
-
-```bash
-sh test.sh
-```
-
-### And coding style tests
-
-Bash unit tester are coded this way
-
-```
-Test examples
-```
-
 ## Deployment
 
-This C server is compatible on MAC OS.
-We are currently working on making it available for any UNIX system.
+Compatible on macOS (`darwin x86_64`).\
+We are currently working on making it available for any UNIX systems.
 
 ## Built With
 
-* [GCC](https://gcc.gnu.org/) - Used Compilator
+* [GCC](https://gcc.gnu.org/) - Compilator
 * [42 Norme](https://github.com/Nqsir/The-Norm-42/blob/master/norme.fr.pdf) - Norme for C
-
-## Contributing
-
-Please read [CONTRIBUTING.md](https://gist.github.com/maxencejded/HTTP-Server/contributing.md) for details on our code of conduct, and the process for submitting pull requests to us.
 
 ## Authors
 
-* **Maxence Jacques** - *Initial work* - [maxencejded](https://github.com/maxencejded)
 * **Jules Spender** - *Initial work* - [spenderj](https://github.com/spenderj)
+* **Maxence Jacques de Dixmude** - *Initial work* - [maxencejded](https://github.com/maxencejded)
 
 See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
 
@@ -103,5 +68,5 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 
 ## Acknowledgments
 
-* HTTP format
-* Signal
+HTTP protocol, Parsing, Dynamic memory management, Optimization, Debugging, Error management
+
