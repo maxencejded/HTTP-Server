@@ -11,7 +11,7 @@ FIELD			= field_accept.c field_content_length.c field_content_type.c\
 					field_expect.c field_host.c
 FIELDS			= fields.c $(FIELD)
 RESPONSE		= response.c protocol.c content_type.c ft_free.c\
-					response_error.c response_success.c
+					response_error.c response_success.c header.c
 
 QUEUE			= queue_init.c node_init.c dequeue.c enqueue.c\
 					is_empty.c peek.c

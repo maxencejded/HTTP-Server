@@ -103,6 +103,7 @@ int					end_connection_success(t_http *request, int reponse, int fd,
 int					end_connection_error(t_http *request, int reponse, int fd,
 		t_reponse *answer);
 char				*get_reponse_message(int reponse);
+void				print_header(t_reponse *answer);
 
 /*
 ** Function used to create valid header

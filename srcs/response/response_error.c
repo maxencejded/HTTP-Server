@@ -13,19 +13,7 @@ static int			write_connection_error(t_reponse *answer)
 	int		reponse;
 	char	buff[PAGE_SIZE];
 
-	answer->protocol ? dprintf(answer->fd, "HTTP/%s ",
-			protocol_version(answer->protocol)) : 0;
-	answer->reponse ? dprintf(answer->fd, "%d %s\r\n", answer->reponse,
-				get_reponse_message(answer->reponse)) : 0;
-	dprintf(answer->fd, "Connexion: close\r\n");
-	answer->date ? dprintf(answer->fd, "Date: %s\r\n", answer->date) : 0;
-	answer->date ? dprintf(answer->fd, "Last-Modified: %s\r\n", answer->date)
-		: 0;
-	answer->content_type ? dprintf(answer->fd, "Content-Type: %s\r\n",
-			answer->content_type) : 0;
-	answer->file_size ? dprintf(answer->fd, "Content-Length: %lu\r\n",
-				(long unsigned int)answer->file_size) : 0;
-	dprintf(answer->fd, "\r\n");
+	print_header(answer);
 	if (answer->file_fd != -1)
 		while ((size = read(answer->file_fd, buff, PAGE_SIZE)) > 0)
 			write(answer->fd, buff, size);
