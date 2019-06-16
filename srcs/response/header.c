@@ -47,12 +47,14 @@ void					print_header(t_reponse *answer)
 {
 	char				*tmp;
 
+	tmp = NULL;
 	answer->protocol ? ft_write(answer->fd, "HTTP/",
 			protocol_version(answer->protocol), " ") : 0;
 	tmp = ft_itoa((long unsigned int)answer->reponse);
 	answer->reponse && tmp ? ft_write(answer->fd, tmp, " ",
 			get_reponse_message(answer->reponse)) : 0;
 	free(tmp);
+	tmp = NULL;
 	ft_write(answer->fd, "\r\n", "Connexion: close", "\r\n");
 	answer->date ? ft_write(answer->fd, "Date: ", answer->date, "\r\n") : 0;
 	answer->date ? ft_write(answer->fd, " Last-Modified: ",
@@ -63,6 +65,7 @@ void					print_header(t_reponse *answer)
 		(tmp = ft_itoa((long unsigned int)answer->file_size)) : 0;
 	answer->file_size ? ft_write(answer->fd, "Content-Length: ", tmp,
 			"\r\n") : 0;
-	free(tmp);
+	if (tmp)
+		free(tmp);
 	write(answer->fd, "\r\n", 2);
 }
