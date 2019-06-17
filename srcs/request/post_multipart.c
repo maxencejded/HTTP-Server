@@ -1,33 +1,6 @@
 #include "server.h"
 
 /*
-** Locate the boundary element in the content
-** If successful, return a pointer to the boundary.
-** Otherwise, a NULL pointer is returned to indicate an error.
-*/
-
-static uint8_t	*locate(const char *content, size_t size, const char *boundary)
-{
-	size_t	i;
-	size_t	j;
-
-	i = 0;
-	while (i < size)
-	{
-		if (content[i] == boundary[0])
-		{
-			j = 0;
-			while ((i + j) < size && content[i + j] == boundary[j])
-				++j;
-			if (boundary[j] == '\0')
-				return ((uint8_t *)(content + i));
-		}
-		++i;
-	}
-	return (NULL);
-}
-
-/*
 ** Find the element search and then allocate the content into the variable key
 ** If successful, return 1. Otherwise, a 0 is returned to indicate an error.
 */
