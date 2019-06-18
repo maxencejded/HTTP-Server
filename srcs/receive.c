@@ -37,7 +37,7 @@ static int		copy(uint8_t *buff, uint8_t **data, uint8_t **end, ssize_t size)
 	if ((*data = (uint8_t *)malloc(sizeof(uint8_t) * size)) == NULL)
 		return (0);
 	memcpy(*data, buff, size);
-	*end = locate((const char *)(*data), size, "\r\n\r\n");
+	*end = locate((const char *)(*data), size, CRLF CRLF);
 	memset(*end, 0, sizeof(uint8_t) * 4);
 	*end = *end + 4;
 	return (1);
@@ -58,7 +58,7 @@ static ssize_t	request_read(int fd, uint8_t **data, uint8_t **end, int *status)
 	memset(buff, 0, PAGE_SIZE);
 	if ((size = recv(fd, buff, PAGE_SIZE, 0)) > 0)
 	{
-		if (locate((const char *)buff, size, "\r\n\r\n") == NULL)
+		if (locate((const char *)buff, size, CRLF CRLF) == NULL)
 		{
 			*status = response_error(fd, NULL, ENTITY_TOO_LARGE);
 			return (0);

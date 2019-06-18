@@ -59,7 +59,7 @@ static int		parse_boundary(t_http *data, uint8_t *buff, size_t size)
 	uint8_t		*content;
 
 	str = (char *)buff;
-	if ((content = locate((const char *)buff, size, "\r\n\r\n")) == NULL)
+	if ((content = locate((const char *)buff, size, CRLF CRLF)) == NULL)
 		return (0);
 	memset(content, 0, sizeof(uint8_t) * 4);
 	content = content + 4;
