@@ -55,7 +55,7 @@ void					print_header(t_reponse *answer)
 			get_reponse_message(answer->reponse)) : 0;
 	free(tmp);
 	tmp = NULL;
-	ft_write(answer->fd, "\r\n", "Connexion: close", "\r\n");
+	ft_write(answer->fd, "\r\n", "Connection: close", "\r\n");
 	answer->date ? ft_write(answer->fd, "Date: ", answer->date, "\r\n") : 0;
 	answer->date ? ft_write(answer->fd, " Last-Modified: ",
 			answer->date, "\r\n") : 0;
