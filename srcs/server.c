@@ -12,7 +12,6 @@ static int		connection_add(int fd, char *address, uint16_t connect)
 	t_http		*data;
 
 	data = NULL;
-	signal(SIGCHLD, sigchld);
 	if ((process = fork()) == 0)
 	{
 		printf("[%3d] %s\n", connect, address);
@@ -41,6 +40,9 @@ static int		loop(void)
 
 	connect = 0;
 	address = NULL;
+
+	signal(SIGCHLD, sigchld);
+
 	while ((fd = socket_accept(g_fd, &address)) > 0)
 	{
 		if (connection_add(fd, address, connect) == 0)
