@@ -105,8 +105,8 @@ static int	socket_sigpipe(int fd)
 
 int			socket_accept(int fd, char **address)
 {
-	int					sock;
-	socklen_t			sock_len;
+	int			sock;
+	socklen_t		sock_len;
 	struct sockaddr_in	sock_init;
 
 	sock_len = sizeof(struct sockaddr_in);

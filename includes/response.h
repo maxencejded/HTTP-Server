@@ -2,6 +2,7 @@
 # define RESPONSE_H
 
 # include <netdb.h>
+# include <stdarg.h>
 # include <stdio.h>
 # include <stdlib.h>
 # include <string.h>
