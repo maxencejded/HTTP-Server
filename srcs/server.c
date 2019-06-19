@@ -69,7 +69,7 @@ int				main(int argc, char **argv)
 	address = NULL;
 	if (argc != 1 && argv[1] == NULL)
 	{
-		printf("Usage: ./server\n");
+		printf("Usage: %s\n", *argv);
 		exit(EXIT_FAILURE);
 	}
 	if ((g_fd = socket_int()) == -1)

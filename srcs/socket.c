@@ -81,14 +81,20 @@ static int	socket_timeout(int fd)
 
 static int	socket_sigpipe(int fd)
 {
-	int		pipe;
-
-	pipe = 1;
+#if !defined(SO_NOSIGPIPE)
+	(void)fd;
+	if (signal(SIGPIPE, SIG_IGN) == SIG_ERR) {
+		perror("ERROR: signal(SIGPIPE, SIG_IGN)");
+		return 0;
+	}
+#else
+	int pipe = 1;
 	if (setsockopt(fd, SOL_SOCKET, SO_NOSIGPIPE, &pipe, sizeof(int)) == -1)
 	{
 		perror("ERROR: Setsockopt(SO_NOSIGPIPE)");
 		return (0);
 	}
+#endif /* !defined(SO_NOSIGPIPE) */
 	return (1);
 }
 
