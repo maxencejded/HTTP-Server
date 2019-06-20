@@ -9,14 +9,14 @@ int			socket_int(void)
 {
 	int					num;
 	int					fd;
-	struct protoent		*proto;
+	struct protoent				*proto;
 
 	if ((proto = getprotobyname("TCP")) == 0)
 	{
 		perror("ERROR: Protocol");
-		return (-1);
+		// return (-1);
 	}
-	if ((fd = socket(PF_INET, SOCK_STREAM, proto->p_proto)) == -1)
+	if ((fd = socket(PF_INET, SOCK_STREAM, proto ? proto->p_proto : 0)) == -1)
 	{
 		perror("ERROR: Socket");
 		return (-1);

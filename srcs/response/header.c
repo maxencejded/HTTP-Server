@@ -64,7 +64,7 @@ void					print_header(t_reponse *answer)
 	answer->protocol ? ft_write(answer->fd, 2, "HTTP/",
 			protocol_version(answer->protocol)) : 0;
 	tmp = ft_itoa((long unsigned int)answer->reponse);
-	answer->reponse && tmp ? ft_write(answer->fd, 3, tmp, " ",
+	answer->reponse && tmp ? ft_write(answer->fd, 4, " ", tmp, " ",
 			get_reponse_message(answer->reponse)) : 0;
 	free(tmp);
 	tmp = NULL;

@@ -59,7 +59,7 @@ OPTIONS:                                                                        
  ```
  
 ### Compatibility
-So far tested to be compatible with macOS (`darwin x86_64`), Linux (both `x86_64` and ARMv7) and NetBSD.\
+So far tested to be compatible with macOS (`darwin x86_64`), Linux (both `x86_64` and ARMv7) and NetBSD as well as Android ([NDK](https://developer.android.com/ndk), [bionic libc](https://android.googlesource.com/platform/bionic).\
 We are currently working on making it available for other UNIX systems.
 
 ## Built With

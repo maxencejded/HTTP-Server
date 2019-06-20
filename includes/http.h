@@ -27,7 +27,9 @@
 # define TIME_OUT		10
 # define CRLF			"\r\n"
 
+#ifndef PAGE_SIZE
 # define PAGE_SIZE		getpagesize()
+#endif
 
 typedef struct		s_http
 {
