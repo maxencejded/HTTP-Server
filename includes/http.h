@@ -22,8 +22,8 @@
 ** HTTP Server configuration
 */
 
-# define PORT			6060
-# define CONNECTION		4
+# define DEFAULT_PORT		6060
+# define CONNECTION_BACKLOG	4
 # define TIME_OUT		10
 # define CRLF			"\r\n"
 
@@ -50,14 +50,6 @@ typedef struct		s_content
 	char			*value;
 	uint8_t			flag;
 }			t_content;
-
-/*
-**  Defined in server.c
-*/
-extern struct s_globalstate {
-	int 			fd;
-	const char		*webdir;
-}	_g;
 
 int				socket_int(void);
 int				socket_bind(int fd, int port, char **address);

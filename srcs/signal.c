@@ -6,7 +6,6 @@
 
 void		exit_server(void)
 {
-	close(_g.fd);
 	exit(EXIT_FAILURE);
 }
 
@@ -17,8 +16,8 @@ void		exit_server(void)
 void		sigstop(int sig)
 {
 	(void)sig;
-	printf("Stoping Server\n");
-	exit(close(_g.fd));
+	printf("%s: SIGINT received. Stopping Server\n", __func__);
+	exit_server();
 }
 
 /*
