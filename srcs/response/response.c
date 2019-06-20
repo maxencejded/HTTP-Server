@@ -157,7 +157,7 @@ int					response(t_http *request, int fd)
 	answer->fd = fd;
 	if (request->method == 0 || request->method > METHOD_PUT)
 		return (end_connection_error(request, NOT_IMPLEMENTED, fd, answer));
-	concatted = concat(WEBSITE_FOLDER_PATH, request->path);
+	concatted = concat(_g.webdir, request->path);
 	if ((!request->path || stat(concatted, &sb) == -1) && ft_free(concatted)
 			== 0)
 		return (start_api_response(request, answer));

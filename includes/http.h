@@ -49,15 +49,21 @@ typedef struct		s_content
 	char			*key;
 	char			*value;
 	uint8_t			flag;
-}					t_content;
+}			t_content;
 
-extern int			g_fd;
+/*
+**  Defined in server.c
+*/
+extern struct s_globalstate {
+	int 			fd;
+	const char		*webdir;
+}	_g;
 
-int					socket_int(void);
-int					socket_bind(int fd, int port, char **address);
-int					socket_accept(int fd, char **address);
+int				socket_int(void);
+int				socket_bind(int fd, int port, char **address);
+int				socket_accept(int fd, char **address);
 
-int					request(int fd, t_http **data, int *status);
+int				request(int fd, t_http **data, int *status);
 
 void				exit_server(void);
 void				sigstop(int sig);

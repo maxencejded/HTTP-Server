@@ -43,7 +43,7 @@ static int		loop(void)
 
 	signal(SIGCHLD, sigchld);
 
-	while ((fd = socket_accept(g_fd, &address)) > 0)
+	while ((fd = socket_accept(_g.fd, &address)) > 0)
 	{
 		if (connection_add(fd, address, connect) == 0)
 			return (0);
@@ -57,7 +57,10 @@ static int		loop(void)
 	return (1);
 }
 
-int				g_fd;
+struct s_globalstate _g = {
+	.fd = -1,
+	.webdir = DEFAULT_WEBDIR_PATH,
+};
 
 /*
 ** Start a HTTP server listenning on the port PORT
@@ -74,17 +77,17 @@ int				main(int argc, char **argv)
 		printf("Usage: %s\n", *argv);
 		exit(EXIT_FAILURE);
 	}
-	if ((g_fd = socket_int()) == -1)
+	if ((_g.fd = socket_int()) == -1)
 		exit(EXIT_FAILURE);
-	if (socket_bind(g_fd, PORT, &address) == 0)
+	if (socket_bind(_g.fd, PORT, &address) == 0)
 		exit_server();
-	if (listen(g_fd, CONNECTION) == -1)
+	if (listen(_g.fd, CONNECTION) == -1)
 		exit_server();
 	printf("Starting new Server\nAdrress: %s:%d\n", address, PORT);
 	strdel(&address);
 	signal(SIGINT, sigstop);
 	if (loop() == 0)
 		exit_server();
-	close(g_fd);
+	close(_g.fd);
 	return (0);
 }

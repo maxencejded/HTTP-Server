@@ -34,9 +34,9 @@ typedef struct		s_response
 */
 
 # define IER				500
-# define WEBSITE_FOLDER_PATH		"site"
-# define ERROR_FOLDER_PATH		"error_pages/"
-# define API_FOLDER_PATH		"api"
+# define DEFAULT_WEBDIR_PATH		"site"
+# define ERROR_DIR_PATH	        	"error_pages/"
+# define API_DIR_PATH			"api"
 
 /*
 ** SUCCESS
