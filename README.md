@@ -48,8 +48,18 @@ int        demo(t_http *request, t_reponse *answer);
 Tests will be available soon. They are being written.
 
 ## Deployment
+### Command line options
+```
+Usage: ./server [OPTIONS]                                                       │
+                                                                                │
+OPTIONS:                                                                        │
+       -w <DIR>        Web server directory (default: site)                     │
+       -p <PORT>       TCP port of server listen socket (default: 6060)         │
+       -h              Produces this information to stdout.
+ ```
+ 
 ### Compatibility
-So far tested to be compatible with macOS (`darwin x86_64`), Linux (both `x86_64` and ARMv7) and NetBSD.\
+So far tested to be compatible with macOS (`darwin x86_64`), Linux (both `x86_64` and ARMv7) and NetBSD as well as Android ([NDK](https://developer.android.com/ndk), [bionic libc](https://android.googlesource.com/platform/bionic).\
 We are currently working on making it available for other UNIX systems.
 
 ## Built With
